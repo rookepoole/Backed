@@ -106,6 +106,12 @@ h2.step{font-family:var(--display);font-weight:800;font-size:clamp(20px,4.6vw,27
 .slot.lead{border-color:var(--gold-deep);background:rgba(217,164,65,.075)}
 .slot.lead .n{color:var(--gold)}
 .slot.mine-busy{opacity:.42}
+.slot .by{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-deep)}
+.slot.lead .by{color:var(--gold)}
+.propose{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:13px;padding-top:13px;border-top:1px solid var(--felt-line)}
+input[type=datetime-local]{font-family:var(--body);font-size:15px;background:rgba(255,255,255,.04);color:var(--paper);
+  border:1px solid var(--felt-line);border-radius:9px;padding:10px 12px;-webkit-appearance:none;flex:1;min-width:190px;color-scheme:dark}
+input[type=datetime-local]:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
 
 /* availability marking mode */
 .slot.mk-free{border-color:var(--felt-line)}
@@ -136,6 +142,11 @@ input[type=text]{font-family:var(--body);font-size:16px;background:rgba(255,255,
   border:1px solid var(--felt-line);border-radius:9px;padding:12px 14px;width:100%;-webkit-appearance:none}
 input[type=text]::placeholder{color:var(--sage-dim)}
 input[type=text]:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
+.gbtn{display:inline-flex;align-items:center;gap:9px;font-family:var(--body);font-weight:600;font-size:14.5px;
+  background:var(--paper);color:#1F1F1F;border:0;border-radius:9px;padding:11px 16px;cursor:pointer;transition:transform .08s}
+.gbtn:active{transform:translateY(1px)}
+.gbtn:disabled{opacity:.5;cursor:default}
+.gbtn svg{flex:none}
 .presets{display:flex;gap:6px;flex-wrap:wrap}
 .preset{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
   background:transparent;color:var(--sage);border:1px solid var(--felt-line);border-radius:20px;padding:8px 14px;cursor:pointer}
@@ -247,7 +258,19 @@ footer a{color:var(--sage)}
     <p class="sub">Everyone who syncs sharpens the board. It reads busy blocks only — no titles, no guests, nothing leaves your browser except which of these times you're free.</p>
 
     <div class="table stack tight">
-      <span class="eyebrow">Option 1 · your calendar's secret link</span>
+      <div id="gwrap" class="stack tight" style="margin-bottom:16px">
+        <span class="eyebrow">Option 1 · Google Calendar</span>
+        <div class="row" style="margin-top:0">
+          <button class="gbtn" id="gsign" type="button">
+            <svg viewBox="0 0 18 18" width="17" height="17" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.3-.2-1.9H9v3.5h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 0 1 0-3.4V5H.9a9 9 0 0 0 0 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>
+            <span id="gsignLabel">Sign in with Google</span>
+          </button>
+          <button class="ghost hide" id="gout" type="button">Disconnect</button>
+        </div>
+        <p class="status" id="gStatus">Reads <b>busy blocks only</b> &mdash; the free/busy endpoint returns times, never titles, guests or locations. Nothing is stored on our side.</p>
+      </div>
+
+      <span class="eyebrow">Option 2 · your calendar's secret link</span>
       <input type="text" id="icsUrl" placeholder="paste an .ics or webcal:// address" autocomplete="off" spellcheck="false">
       <div class="row" style="margin-top:4px">
         <button class="ghost" id="pullIcs" type="button">Sync from link</button>
@@ -294,6 +317,12 @@ footer a{color:var(--sage)}
         <span><i style="background:var(--amber)"></i>someone's a maybe</span>
         <span><i style="background:var(--red)"></i>someone's booked</span>
       </p>
+      <div class="propose">
+        <label for="propAt" class="eyebrow" style="width:100%">None of these work? Put your own time on the table</label>
+        <input type="datetime-local" id="propAt">
+        <button class="ghost" id="propose" type="button">Propose it</button>
+      </div>
+      <p class="status" id="pStatus" style="margin-top:8px"></p>
       <div class="row">
         <button class="ghost" id="takeBack" type="button">Take them back</button>
         <p class="status" id="tStatus"></p>
@@ -344,7 +373,7 @@ footer a{color:var(--sage)}
 
   <footer>
     when you available · built for Cortex Research Group, Season 2 Episode 5<br>
-    <a href="https://github.com/aunysillyme/whenyouavailable">source</a>
+    <a href="https://github.com/aunysillyme/wya">source</a>
   </footer>
 </div>
 
@@ -524,6 +553,10 @@ var local = false, demo = false, timer = null, busy = false;
 var myMarks = {};   // slotId -> "maybe" | "busy"   (free is simply absent)
 
 /* ---------- the board's times ---------- */
+function labelFor(t){
+  return t.toLocaleDateString(undefined,{weekday:"short"}) + " " +
+         t.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}).replace(/\s/g,"").toLowerCase();
+}
 function makeSlots(kind){
   var out = [], base = new Date(), bands = [[18,30],[20,0]], days = [], i, k, n = 0;
   base.setHours(0,0,0,0);
@@ -683,6 +716,15 @@ function act(what, extra){
       lroom.stakes[extra.slotId][playerId] = (lroom.stakes[extra.slotId][playerId]||0) + 1;
       if (!lroom.firstChipAt) lroom.firstChipAt = Date.now();
       settle(lroom);
+    } else if (what === "propose"){
+      if (lroom.locked) return Promise.reject(new Error("The board already closed."));
+      if (lroom.slots.length >= 24) return Promise.reject(new Error("The table is full."));
+      if (lroom.slots.some(function(x){ return Math.abs(x.startsAt - extra.startsAt) < 60000; }))
+        return Promise.reject(new Error("That time is already on the table."));
+      lroom.slots.push({ id:"u"+Math.random().toString(36).slice(2,8), label:extra.label,
+        startsAt:extra.startsAt, endsAt:extra.startsAt+90*60000,
+        by:playerId, byName:lroom.players[playerId].name });
+      lroom.slots.sort(function(x,y){ return x.startsAt - y.startsAt; });
     } else if (what === "unchip"){
       if (!lroom.locked){ for (var s in lroom.stakes) delete lroom.stakes[s][playerId]; }
     } else if (what === "attend"){
@@ -708,6 +750,114 @@ function act(what, extra){
   var body = { playerId: playerId }, k;
   for (k in extra) body[k] = extra[k];
   return post("/room/" + code + "/" + what, body);
+}
+
+/* ---------- Google Calendar ----------
+   Google Identity Services, browser-side only. There is no client secret and no
+   backend in this path: GIS hands back a short-lived access token, we ask the
+   free/busy endpoint which of THIS board's times are blocked, and the token is
+   dropped when the tab closes.
+
+   Scope is calendar.freebusy, deliberately the narrowest one that answers the
+   question. It returns busy intervals and nothing else - no titles, no guests,
+   no locations - so the promise on screen is one the code actually keeps.
+
+   Entirely optional. The .ics paths and the tap-to-mark grid do the same job for
+   anyone who would rather not connect an account, and the whole step can be
+   skipped. */
+var GOOGLE_CLIENT_ID = (qs.get("gclient") || "").trim();
+var gToken = null, gLoaded = false;
+
+function loadGis(){
+  if (gLoaded) return Promise.resolve(true);
+  return new Promise(function(res){
+    var t = document.createElement("script");
+    t.src = "https://accounts.google.com/gsi/client";
+    t.async = true; t.defer = true;
+    t.onload = function(){ gLoaded = true; res(true); };
+    t.onerror = function(){ res(false); };
+    document.head.appendChild(t);
+  });
+}
+
+function gSay(msg, kind){
+  var g = el("gStatus");
+  g.className = "status" + (kind ? " " + kind : "");
+  g.innerHTML = msg;
+}
+
+function googleWindow(){
+  var w = windowOfBoard();
+  return { timeMin: new Date(w[0]).toISOString(), timeMax: new Date(w[1]).toISOString() };
+}
+
+function googleSync(){
+  var w = googleWindow();
+  return fetch("https://www.googleapis.com/calendar/v3/freeBusy", {
+    method: "POST",
+    headers: { "authorization": "Bearer " + gToken, "content-type": "application/json" },
+    body: JSON.stringify({ timeMin: w.timeMin, timeMax: w.timeMax, items: [{ id: "primary" }] })
+  }).then(function(r){
+    if (!r.ok) throw new Error(r.status === 401 ? "That sign-in expired. Try again." : "Google returned " + r.status + ".");
+    return r.json();
+  }).then(function(j){
+    /* Verify the SHAPE, never that the call returned. A differently-shaped
+       payload must read as a failure, not as an empty calendar - an empty
+       calendar would silently mark every slot free. */
+    var cal = j && j.calendars && j.calendars.primary;
+    if (!cal || !Array.isArray(cal.busy))
+      throw new Error("Google replied in a shape we didn't expect, so nothing was marked.");
+    var windows = cal.busy.map(function(b){
+      return { start: Date.parse(b.start), end: Date.parse(b.end), allDay: false };
+    }).filter(function(b){ return isFinite(b.start) && isFinite(b.end); });
+    var found = window.ICS.applyTo(state.slots, windows);
+    var n = 0, k;
+    for (k in found){ myMarks[k] = found[k]; n++; }
+    renderMarkGrid();
+    gSay("Read <b>" + windows.length + "</b> busy block" + (windows.length===1?"":"s") +
+         " and marked <b>" + n + "</b> of these times booked. Adjust anything below.", "good");
+  });
+}
+
+function gConnect(){
+  if (!GOOGLE_CLIENT_ID){
+    gSay("Google sign-in needs a client ID for this domain, which isn't wired up yet. " +
+         "<b>Use the .ics link or file below</b> &mdash; same result, no account. " +
+         "(Or append <code>?gclient=YOUR_ID</code> to this url to try one.)", "err");
+    return;
+  }
+  el("gsign").disabled = true;
+  gSay("Opening Google...");
+  loadGis().then(function(ok){
+    if (!ok || !window.google || !google.accounts || !google.accounts.oauth2){
+      el("gsign").disabled = false;
+      gSay("Couldn't reach Google. Use the .ics link or file below instead.", "err");
+      return;
+    }
+    var client = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: "https://www.googleapis.com/auth/calendar.freebusy",
+      callback: function(resp){
+        el("gsign").disabled = false;
+        if (!resp || !resp.access_token){
+          gSay("Sign-in was cancelled. Nothing changed.", "err");
+          return;
+        }
+        gToken = resp.access_token;
+        el("gsignLabel").textContent = "Re-sync from Google";
+        el("gout").classList.remove("hide");
+        gSay("Connected. Reading your free/busy...");
+        googleSync().catch(function(e){
+          gSay((e.message || "That didn't sync.") + " The .ics options below still work.", "err");
+        });
+      },
+      error_callback: function(){
+        el("gsign").disabled = false;
+        gSay("Sign-in didn't complete. Nothing changed.", "err");
+      }
+    });
+    client.requestAccessToken();
+  });
 }
 
 /* ---------- calendar ---------- */
@@ -825,7 +975,13 @@ function renderTable(){
       for (var k = 0; k < m[pid]; k++) pile.appendChild(chipEl(colorFor(pid), true));
     });
 
-    b.appendChild(when); b.appendChild(tag); b.appendChild(pile);
+    b.appendChild(when); b.appendChild(tag);
+    if (s.byName){
+      var by = document.createElement("span"); by.className = "by";
+      by.textContent = (s.by === playerId ? "you asked for this" : s.byName + " asked for this");
+      b.appendChild(by);
+    }
+    b.appendChild(pile);
     b.addEventListener("click", function(){ drop(s.id); });
     grid.appendChild(b);
   });
@@ -1083,6 +1239,14 @@ el("demo").addEventListener("click", function(){
 });
 
 /* sync screen */
+el("gsign").addEventListener("click", gConnect);
+el("gout").addEventListener("click", function(){
+  gToken = null;
+  el("gsignLabel").textContent = "Sign in with Google";
+  this.classList.add("hide");
+  try { if (window.google && google.accounts && google.accounts.oauth2 && gToken) google.accounts.oauth2.revoke(gToken); } catch(e){}
+  gSay("Disconnected. The marks you already have stay until you change them.");
+});
 el("pickFile").addEventListener("click", function(){ el("icsFile").click(); });
 el("icsFile").addEventListener("change", function(){
   var f = this.files && this.files[0];
@@ -1119,6 +1283,29 @@ function finishSync(save){
 el("doneSync").addEventListener("click", function(){ finishSync(true); });
 el("skipSync").addEventListener("click", function(){ finishSync(false); });
 el("backToSync").addEventListener("click", function(){ show("syncScreen"); renderMarkGrid(); });
+
+el("propose").addEventListener("click", function(){
+  var raw = el("propAt").value;
+  var st = el("pStatus");
+  if (!raw){ st.className = "status err"; st.textContent = "Pick a date and a time first."; return; }
+  var when = new Date(raw);
+  if (isNaN(when.getTime())){ st.className = "status err"; st.textContent = "That date didn't read."; return; }
+  if (when.getTime() < Date.now() - 60000){ st.className = "status err"; st.textContent = "That one's already been and gone."; return; }
+  var btn = this; btn.disabled = true;
+  st.className = "status"; st.textContent = "Putting it on the table...";
+  busy = true;
+  act("propose", { startsAt: when.getTime(), label: labelFor(when) }).then(function(x){
+    state = x; busy = false; btn.disabled = false;
+    el("propAt").value = "";
+    st.className = "status good";
+    st.textContent = labelFor(when) + " is on the table, with your name on it.";
+    paint();
+  }).catch(function(e){
+    busy = false; btn.disabled = false;
+    st.className = "status err";
+    st.textContent = e.message || "Couldn't add that.";
+  });
+});
 
 el("takeBack").addEventListener("click", function(){
   busy = true;

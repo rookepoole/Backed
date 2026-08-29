@@ -196,6 +196,30 @@ export class Room {
         return { room: r };
       }
 
+      /* Anyone at the table can put a time on it, not just whoever opened the
+         room. The proposer's name rides on the slot: a time somebody actually
+         asked for reads differently from one the preset generated. */
+      case "propose": {
+        if (r.locked) return { error: "The board already closed." };
+        const at = +b.startsAt;
+        if (!Number.isFinite(at)) return { error: "Pick a date and a time." };
+        if (at < Date.now() - 60000) return { error: "That one's already been and gone." };
+        if (r.slots.length >= 24)
+          return { error: "The table is full. Wrap this round up first." };
+        if (r.slots.some((s) => Math.abs(s.startsAt - at) < 60000))
+          return { error: "That time is already on the table." };
+        r.slots.push({
+          id: "u" + Math.random().toString(36).slice(2, 8),
+          label: String(b.label || "").slice(0, 40),
+          startsAt: at,
+          endsAt: at + 5400000,
+          by: me,
+          byName: r.players[me].name,
+        });
+        r.slots.sort((x, y) => x.startsAt - y.startsAt);
+        return { room: r };
+      }
+
       case "unchip": {
         if (r.locked) return { error: "The board already closed." };
         for (const sid of Object.keys(r.stakes)) delete r.stakes[sid][me];
