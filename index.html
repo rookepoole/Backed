@@ -416,6 +416,7 @@ footer a{color:var(--sage)}
   <section id="historyPanel" class="stack hide" style="margin-top:34px">
     <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
       <h2 class="step" id="histTitle">Previous meetings</h2>
+      <span class="realflag" style="margin-left:-4px">written by the ai notetaker</span>
       <button class="ghost" id="histToggle" type="button" aria-expanded="false">Show</button>
     </div>
     <div class="table hide" id="histBody"></div>
@@ -699,6 +700,37 @@ function seedBots(){
     lroom.stakes[slot.id] = lroom.stakes[slot.id] || {};
     p[1].forEach(function(pair){ lroom.stakes[slot.id]["b"+pair[0]] = pair[1]; });
   });
+
+  /* One meeting already in the book. Without it the notetaker and the whole
+     previous-meetings panel stay invisible until somebody plays a full round,
+     which on a demo nobody does - so the two things that make this a loop
+     rather than a poll never get seen. */
+  lroom.history = [{
+    at: Date.now() - 6 * 86400000,
+    label: "Tue 6:30pm",
+    chipsFor: 11, runnerUp: 4, settledIn: 9,
+    people: [
+      { name:"Mara", chips:4, attendance:"showed" },
+      { name:"Dev",  chips:3, attendance:"showed" },
+      { name:"Iz",   chips:3, attendance:"showed" },
+      { name:"Sam",  chips:1, attendance:"noshow" }
+    ],
+    notes: [
+      { name:"Mara", text:"Agreed we ship the beta on the 12th, not the 5th. Two weeks was never real.", at: Date.now() - 6*86400000 },
+      { name:"Dev",  text:"I'll do the migration script. Iz reviews it before it touches anything live.", at: Date.now() - 6*86400000 },
+      { name:"Iz",   text:"Sam to confirm the venue by Thursday or we move it back to the office.", at: Date.now() - 6*86400000 }
+    ],
+    facts: [
+      "Called for Tue 6:30pm.",
+      "Won on 11 chips against 4, and closed early because nothing left in hand could catch it.",
+      "Settled 9 minutes after the first chip.",
+      "4 staked in: 3 turned up, Sam did not."
+    ],
+    summary: "The beta ships on the 12th rather than the 5th, since two weeks was never realistic. " +
+             "Dev is writing the migration script and Iz reviews it before it touches anything live. " +
+             "Sam needs to confirm the venue by Thursday, otherwise it moves back to the office.",
+    summarised: true
+  }];
 }
 
 // The notetaker, solo-table edition: the same factual record composed from what
@@ -1096,10 +1128,18 @@ function renderNotes(){
   });
 }
 
+var histOpened = false;
 function renderHistory(){
   var h = (state && state.history) || [];
   el("historyPanel").classList.toggle("hide", !h.length);
   if (!h.length) return;
+  /* Open it once, unasked, the first time there is anything in it. */
+  if (!histOpened){
+    histOpened = true;
+    el("histBody").classList.remove("hide");
+    el("histToggle").textContent = "Hide";
+    el("histToggle").setAttribute("aria-expanded", "true");
+  }
   el("histTitle").textContent = "Previous meetings (" + h.length + ")";
   var body = el("histBody"); body.textContent = "";
   h.slice().reverse().forEach(function(m){
