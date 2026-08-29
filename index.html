@@ -115,6 +115,8 @@ h2.step{font-family:var(--display);font-weight:800;font-size:clamp(20px,4.6vw,27
 .slot.conflict .tag{color:var(--red)}
 .slot.conflict{opacity:.6}
 .slot.lead{border-color:var(--gold-deep);background:rgba(217,164,65,.075)}
+.slot.lead::after{content:"leading";position:absolute;top:8px;right:9px;font-family:var(--mono);
+  font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--gold)}
 .slot.lead .n{color:var(--gold)}
 .slot.mine-busy{opacity:.42}
 .slot .by{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-deep)}
@@ -664,7 +666,27 @@ function settle(r){
   if (r.locked) return r;
   var t = totalsOf(r).sort(function(a,b){ return b.n-a.n; });
   if (t.length < 2 || t[0].n === 0) return r;
-  if (t[0].n - t[1].n > unspentOf(r)){ r.locked = true; r.winner = t[0].id; r.lockedAt = Date.now(); }
+  var un = unspentOf(r);
+  if (t[0].n - t[1].n > un){
+    r.locked = true; r.winner = t[0].id; r.lockedAt = Date.now(); r.decidedBy = "lead";
+    return r;
+  }
+  /* Every chip spent and still level: break it, or the board sits open forever
+     with nobody holding a chip that could move it. */
+  if (un === 0){
+    var top = t[0].n, tied = t.filter(function(x){ return x.n === top; }).map(function(x){ return x.id; });
+    if (tied.length < 2) return r;
+    var av = availOf(r), byId = {};
+    r.slots.forEach(function(x){ byId[x.id] = x; });
+    tied.sort(function(x,y){
+      var a = av[x], b = av[y];
+      if (a.busy !== b.busy) return a.busy - b.busy;
+      if (a.maybe !== b.maybe) return a.maybe - b.maybe;
+      return byId[x].startsAt - byId[y].startsAt;
+    });
+    r.locked = true; r.winner = tied[0]; r.lockedAt = Date.now();
+    r.decidedBy = "tie"; r.tiedWith = tied.length;
+  }
   return r;
 }
 function viewOf(r){
@@ -673,7 +695,7 @@ function viewOf(r){
     availability:av, clean:r.slots.filter(function(x){ return av[x.id].state==="clean"; }).map(function(x){ return x.id; }),
     synced:Object.keys(r.players).filter(function(p){ return r.players[p].synced; }).length,
     playerCount:Object.keys(r.players).length,
-    locked:r.locked, winner:r.winner, attendance:r.attendance, chips:CHIPS, totals:t,
+    locked:r.locked, winner:r.winner, decidedBy:r.decidedBy||null, tiedWith:r.tiedWith||0, attendance:r.attendance, chips:CHIPS, totals:t,
     notes:r.notes||[], history:r.history||[], firstChipAt:r.firstChipAt||null,
     unspent:unspentOf(r), gap: s.length>1 ? s[0].n-s[1].n : 0, leader: s.length && s[0].n>0 ? s[0].id : null };
 }
@@ -1055,9 +1077,11 @@ function renderTable(){
   crew.appendChild(lbl);
 
   var st = el("tStatus"); st.className = "status";
-  if (left === 0) st.innerHTML = "Your hand is empty. <b>" + state.unspent + "</b> still unspent, so it can still move.";
-  else if (!state.leader) st.textContent = "Nothing staked yet. Drop a chip on a time you'll actually turn up for.";
-  else st.innerHTML = "Leader is up <b>" + state.gap + "</b>, with <b>" + state.unspent + "</b> unspent. Still open.";
+  if (!state.leader) st.innerHTML = "Nothing staked yet. <b>Most chips wins</b> &mdash; drop one on a time you'll actually turn up for.";
+  else if (left === 0) st.innerHTML = "Your hand is empty. Leading time is up <b>" + state.gap +
+    "</b> with <b>" + state.unspent + "</b> still in other hands, so it can still move.";
+  else st.innerHTML = "<b>Most chips wins.</b> The leader is up <b>" + state.gap + "</b> and there are <b>" +
+    state.unspent + "</b> chips left in hands &mdash; it locks itself the moment the lead is more than those.";
   el("takeBack").disabled = state.locked || left === myChips() || busy;
 }
 
@@ -1066,8 +1090,12 @@ function renderCalled(){
   state.slots.forEach(function(s){ if (s.id === state.winner) w = s; });
   el("calledTime").textContent = w ? w.label : "—";
   var t = state.totals.slice().sort(function(a,b){ return b.n-a.n; });
-  el("calledWhy").textContent = "Nothing left in anyone's hand can catch it - " + t[0].n +
-    " chips against " + (t[1] ? t[1].n : 0) + ", with " + state.unspent + " unspent. So it stopped asking.";
+  el("calledWhy").textContent = state.decidedBy === "tie"
+    ? "Every chip was spent and " + (state.tiedWith || 2) + " times were level on " + t[0].n +
+      ". Broken on the one fewest of you had a conflict with, and the earlier of those. Nothing was left to play."
+    : "Most chips wins, and this one can no longer be caught - " + t[0].n +
+      " against " + (t[1] ? t[1].n : 0) + ", with only " + state.unspent +
+      " still in anyone's hand. So it stopped asking.";
 
   var m = state.stakes[state.winner] || {};
   var roster = el("roster"); roster.textContent = "";

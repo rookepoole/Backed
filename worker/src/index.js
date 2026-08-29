@@ -302,6 +302,8 @@ export class Room {
         r.notes = [];
         r.locked = false;
         r.winner = null;
+        r.decidedBy = null;
+        r.tiedWith = 0;
         r.lockedAt = null;
         r.firstChipAt = null;
         for (const pid of Object.keys(r.players)) {
@@ -343,10 +345,43 @@ export class Room {
     if (r.locked) return;
     const t = this.totals(r).sort((a, b) => b.n - a.n);
     if (t.length < 2 || t[0].n === 0) return;
-    if (t[0].n - t[1].n > this.unspent(r)) {
-      r.locked = true;
-      r.winner = t[0].id;
-      r.lockedAt = Date.now();
+    const unspent = this.unspent(r);
+
+    /* The ordinary close: the leader's margin is bigger than every chip still
+       in every hand, so waiting can no longer change the answer. */
+    if (t[0].n - t[1].n > unspent) {
+      r.locked = true; r.winner = t[0].id; r.lockedAt = Date.now();
+      r.decidedBy = "lead";
+      return;
+    }
+
+    /* Nothing left to play and still level. Without this the board sits open
+       forever on a dead tie and nobody holds a chip that could move it.
+       Broken on the thing the room already agreed matters: the time that suits
+       the most people, and the sooner of two that suit equally. */
+    if (unspent === 0) {
+      const top = t[0].n;
+      const tied = t.filter((x) => x.n === top).map((x) => x.id);
+      if (tied.length < 2) return;
+      const conflict = {};
+      for (const s2 of r.slots) {
+        let busy = 0, maybe = 0;
+        for (const pid of Object.keys(r.players)) {
+          const v = (r.avail[pid] || {})[s2.id];
+          if (v === "busy") busy++;
+          else if (v === "maybe") maybe++;
+        }
+        conflict[s2.id] = { busy, maybe, at: s2.startsAt };
+      }
+      tied.sort((x, y) => {
+        const a = conflict[x], b = conflict[y];
+        if (a.busy !== b.busy) return a.busy - b.busy;
+        if (a.maybe !== b.maybe) return a.maybe - b.maybe;
+        return a.at - b.at;
+      });
+      r.locked = true; r.winner = tied[0]; r.lockedAt = Date.now();
+      r.decidedBy = "tie";
+      r.tiedWith = tied.length;
     }
   }
 
@@ -372,7 +407,13 @@ export class Room {
 
     const facts = [];
     facts.push(slot ? "Called for " + slot.label + "." : "A time was called.");
-    if (t.length > 1)
+    if (r.decidedBy === "tie")
+      facts.push(
+        "Tied on " + (t.length ? t[0].n : 0) + " chips with " + ((r.tiedWith || 2) - 1) +
+          " other time" + ((r.tiedWith || 2) - 1 === 1 ? "" : "s") +
+          ", and took the one fewest people had a conflict with."
+      );
+    else if (t.length > 1)
       facts.push(
         "Won on " + t[0].n + " chips against " + t[1].n +
           ", and closed early because nothing left in hand could catch it."
@@ -433,6 +474,8 @@ export class Room {
       playerCount: Object.keys(r.players).length,
       locked: r.locked,
       winner: r.winner,
+      decidedBy: r.decidedBy || null,
+      tiedWith: r.tiedWith || 0,
       attendance: r.attendance,
       chips: CHIPS,
       totals,
