@@ -95,11 +95,13 @@ ok(v.synced===0,"everyone is unsynced again on the new board");
 e=await P(`/room/${CODE}/chip`,{playerId:"pFAKE",slotId:"s1"});
 ok(e.s===403,"an unknown player is refused");
 
-// ics guard
-e=await P(`/ics`,{url:"not a url"});
-ok(e.s===400,"junk calendar link is refused with a readable message");
+// /ics was removed: it fetched a user-supplied URL server-side, which is an
+// open fetch proxy on a public endpoint, and nothing needed it. Calendar files
+// are parsed in the browser instead. Assert it is GONE, not that it behaves.
 e=await P(`/ics`,{url:"https://example.com/"});
-ok(e.s===422,"a real url that is not a calendar is refused");
+ok(e.s===404,"the /ics fetch proxy no longer exists");
+e=await P(`/ics`,{url:"http://169.254.169.254/latest/meta-data/"});
+ok(e.s===404,"and it cannot be pointed at an internal address either");
 
 console.log("\n"+pass+"/"+(pass+fail)+" passed");
 process.exit(fail?1:0);

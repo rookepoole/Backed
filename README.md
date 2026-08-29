@@ -25,10 +25,10 @@ them.
 1. **Get in.** The room code mints itself into the url, so the address bar is
    the invite. Name only, no account. First person through the door sets the
    times from three one-tap presets.
-2. **Sync a calendar.** Sign in with Google, paste the secret `.ics` address
-   Google/Apple/Outlook publish, drop an `.ics` file (parsed in your browser,
-   nothing uploaded), or just tap slots to cycle free → maybe → busy. Every one
-   of them optional, and the whole step has a Skip button.
+2. **Say what you can't make.** A demo Google sync, an exported `.ics` file
+   (parsed in your browser, never uploaded), or just tap the times. All
+   optional, and the whole step has a Skip button. You only ever flag conflicts:
+   leaving a time open is deliberately not a promise to be there.
 3. **The board suggests.** A time is only clean if it is clean for everyone, so
    one person's conflict is the table's conflict. Anyone at the table can also
    propose a specific date and time, and the slot carries the name of whoever
@@ -66,25 +66,17 @@ the board rather than pretending. `worker/test-loop.mjs` drives the whole loop
 against the deployed worker: 31 assertions, entry through the record and the
 next round.
 
-## Google sign-in
+## What the worker does, and does not
 
-Optional, and inert until a client ID is wired in. To turn it on:
+The worker holds the room and nothing else: join, availability, chips, the close
+rule, attendance, notes, the record. Every rule that decides anything lives
+there, never in the client.
 
-1. Google Cloud Console → **APIs & Services → the credentials page**, on the
-   project with the Calendar API enabled (`claude-mcp-auny`).
-2. **Create an OAuth client ID → Web application.**
-3. **Authorised JavaScript origins:** `https://aunysillyme.github.io`
-   No redirect URI is needed — this is the GIS token flow, not a redirect flow,
-   so there is no client secret anywhere and no backend in the path.
-4. Try it live by appending `?gclient=<CLIENT_ID>` to the url.
-5. To make it the default, set `GOOGLE_CLIENT_ID` in `index.html`.
-
-The scope is `calendar.freebusy`, deliberately the narrowest one that answers
-the question: it returns busy intervals and nothing else — no titles, no guests,
-no locations. The token is short-lived and dropped when the tab closes.
-
-Without a client ID the button says so and points at the `.ics` options, which
-need no account and reach the same result.
+It has **no calendar endpoint**. An earlier version had `POST /ics`, which
+fetched a URL the caller supplied so a paste-a-link flow could get past CORS.
+That is an open fetch proxy on a public endpoint, nothing needed it, and it was
+removed. Calendar files are parsed in the browser instead, which is both safer
+and simpler: no server is in that path at all.
 
 ## Limits, stated not hidden
 

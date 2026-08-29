@@ -27,42 +27,6 @@ export default {
     const url = new URL(req.url);
     const p = url.pathname.split("/").filter(Boolean);
 
-    /* Fetch a calendar feed the browser cannot reach. Google, Apple and Outlook
-       each publish a secret .ics address and none of them send CORS headers, so
-       this hop is the only way a paste-a-link flow can work at all. The feed is
-       returned to the browser and parsed there - it is never stored here. */
-    if (p[0] === "ics" && req.method === "POST") {
-      let feed;
-      try {
-        feed = (await req.json()).url;
-      } catch {
-        return json({ error: "Couldn't read that request." }, 400);
-      }
-      if (typeof feed !== "string" || !feed.trim())
-        return json({ error: "Paste the address first." }, 400);
-      let u;
-      try {
-        u = new URL(feed.trim().replace(/^webcal:\/\//i, "https://"));
-      } catch {
-        return json({ error: "That doesn't look like a link." }, 400);
-      }
-      if (u.protocol !== "https:" && u.protocol !== "http:")
-        return json({ error: "Only http and https calendar links." }, 400);
-      try {
-        const r = await fetch(u.toString(), {
-          headers: { "user-agent": "when-you-available/1.0" },
-          redirect: "follow",
-        });
-        if (!r.ok) return json({ error: "The calendar returned " + r.status + "." }, 502);
-        const text = (await r.text()).slice(0, 4_000_000);
-        if (!/BEGIN:VCALENDAR/i.test(text))
-          return json({ error: "That link isn't a calendar feed." }, 422);
-        return json({ ics: text });
-      } catch {
-        return json({ error: "Couldn't reach that calendar." }, 502);
-      }
-    }
-
     if (p[0] === "room" && p[1]) {
       const code = p[1].toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
       if (!code) return json({ error: "No room." }, 400);

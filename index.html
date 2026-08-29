@@ -328,12 +328,10 @@ footer a{color:var(--sage)}
       </div>
 
       <div class="way">
-        <div class="wayhd"><span class="wn">2</span><b>Your calendar&rsquo;s secret link</b><span class="realflag">reads your real calendar</span></div>
-        <p class="wayd">Google, Apple and Outlook each publish a private <code>.ics</code> address. In Google: Settings &rarr; your calendar &rarr; <em>Secret address in iCal format</em>. Or drop a downloaded <code>.ics</code> file, which is parsed here in your browser and never uploaded.</p>
-        <input type="text" id="icsUrl" placeholder="paste an .ics or webcal:// address" autocomplete="off" spellcheck="false">
-        <div class="row" style="margin-top:8px">
-          <button class="ghost" id="pullIcs" type="button">Sync from link</button>
-          <button class="ghost" id="pickFile" type="button">Or choose a file</button>
+        <div class="wayhd"><span class="wn">2</span><b>A calendar file</b><span class="realflag">reads your real calendar</span></div>
+        <p class="wayd">Export a <code>.ics</code> from Google, Apple or Outlook and drop it in. It is parsed here in your browser and never uploaded &mdash; no server sees it, because there is no server in this path at all.</p>
+        <div class="row" style="margin-top:0">
+          <button class="ghost" id="pickFile" type="button">Choose an .ics file</button>
           <input type="file" id="icsFile" accept=".ics,text/calendar" class="hide">
         </div>
         <p class="status" id="syncStatus"></p>
@@ -1391,20 +1389,6 @@ el("icsFile").addEventListener("change", function(){
   };
   fr.onerror = function(){ el("syncStatus").className = "status err"; el("syncStatus").textContent = "Couldn't read that file."; };
   fr.readAsText(f);
-});
-el("pullIcs").addEventListener("click", function(){
-  var u = el("icsUrl").value.trim();
-  if (!u){ el("syncStatus").className = "status err"; el("syncStatus").textContent = "Paste the address first."; return; }
-  var s = el("syncStatus"); s.className = "status"; s.textContent = "Fetching...";
-  this.disabled = true;
-  var btn = this;
-  post("/ics", { url: u }).then(function(r){ ingestIcs(r.ics); })
-    .catch(function(e){
-      s.className = "status err";
-      s.textContent = (e.message || "Couldn't fetch that.") +
-        (local ? "" : " If it's private, download the .ics and use the file picker.");
-    })
-    .then(function(){ btn.disabled = false; });
 });
 function finishSync(save){
   var go = function(){ show("tableScreen"); renderTable(); };
