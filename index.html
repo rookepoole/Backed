@@ -215,6 +215,11 @@ textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:tra
 .mtg .att span.no{border-color:var(--red);color:var(--red)}
 footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--felt-line);font-family:var(--mono);font-size:11px;color:var(--sage-dim);line-height:1.7}
 footer a{color:var(--sage)}
+@media(max-width:760px){
+  /* Apple's 44px floor. The primary CTA sat at 42 and the demo button at 34. */
+  button.solid,button.ghost,.gbtn,.preset,input[type=text],input[type=datetime-local]{min-height:44px}
+  .howrow{grid-template-columns:1fr}
+}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important}}
 @keyframes pulse{0%,100%{opacity:.3}50%{opacity:.75}}
 </style>
