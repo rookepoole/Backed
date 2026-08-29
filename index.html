@@ -52,7 +52,10 @@ body{
 .how b{font-size:15px;font-weight:600;letter-spacing:-.01em;line-height:1.25}
 .how span.hd{color:var(--sage);font-size:13.5px;line-height:1.45}
 .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--sage);margin:0}
-.wordmark{font-family:var(--body);font-weight:700;font-size:17px;margin:0;letter-spacing:-.01em}
+.wordmark{font-family:var(--body);font-weight:700;font-size:17px;margin:0;letter-spacing:-.01em;
+  background:none;border:0;padding:0;color:var(--paper);cursor:pointer;text-align:left;font-family:var(--body)}
+.wordmark.home:hover{color:var(--gold)}
+#join .wordmark:hover{color:var(--gold)}
 h1.thesis{font-family:var(--display);font-weight:800;font-size:clamp(27px,6.6vw,42px);line-height:1.04;letter-spacing:-.03em;margin:0;text-wrap:balance}
 h1.thesis em{font-style:normal;color:var(--gold)}
 h2.step{font-family:var(--display);font-weight:800;font-size:clamp(20px,4.6vw,27px);line-height:1.1;letter-spacing:-.02em;margin:0;text-wrap:balance}
@@ -245,7 +248,7 @@ footer a{color:var(--sage)}
   <!-- ========== 1 · JOIN ========== -->
   <section id="join" class="stack">
     <div class="brandrow">
-      <p class="wordmark">when you available</p>
+      <button class="wordmark home" type="button" data-home>when you available</button>
       <span class="what">group scheduler</span>
     </div>
     <p class="oneline">Everyone syncs their calendar, the board shows the times that are
@@ -294,12 +297,15 @@ footer a{color:var(--sage)}
       </div>
     </div>
 
+    <p class="banner hide" id="resume"><b>You&rsquo;re already at a table.</b>
+      <button class="ghost" id="backToTable" type="button" style="margin-left:6px">Back to the board</button></p>
+
     <p class="banner"><b>Just looking?</b> <button class="ghost" id="demo" type="button" style="margin-left:6px">Deal a demo table</button> — four people already synced and staked, so you can see the whole thing without waiting for friends.</p>
   </section>
 
   <!-- ========== 2 · SYNC ========== -->
   <section id="syncScreen" class="stack hide">
-    <p class="wordmark">when you available</p>
+    <button class="wordmark home" type="button" data-home>when you available</button>
     <p class="steps"><span class="done">1 seat</span><i>›</i><span class="on">2 sync</span><i>›</i><span>3 stake</span><i>›</i><span>4 show up</span></p>
 
     <h2 class="step">What can&rsquo;t you make?</h2>
@@ -351,7 +357,7 @@ footer a{color:var(--sage)}
 
   <!-- ========== 3 · TABLE ========== -->
   <section id="tableScreen" class="stack hide">
-    <p class="wordmark">when you available</p>
+    <button class="wordmark home" type="button" data-home>when you available</button>
     <p class="steps"><span class="done">1 seat</span><i>›</i><span class="done">2 sync</span><i>›</i><span class="on">3 stake</span><i>›</i><span>4 show up</span></p>
     <p class="codeline">Room <b id="tCode">—</b>
       <button class="ghost" id="copy" type="button">Copy invite</button>
@@ -389,7 +395,7 @@ footer a{color:var(--sage)}
 
   <!-- ========== 4 · CALLED ========== -->
   <section id="calledScreen" class="stack hide">
-    <p class="wordmark">when you available</p>
+    <button class="wordmark home" type="button" data-home>when you available</button>
     <p class="steps"><span class="done">1 seat</span><i>›</i><span class="done">2 sync</span><i>›</i><span class="done">3 stake</span><i>›</i><span class="on">4 show up</span></p>
     <div class="called">
       <div>
@@ -1307,6 +1313,7 @@ document.querySelectorAll(".preset").forEach(function(b){
 
 function seated(r){
   playerId = r.playerId; state = r.state;
+  el("resume").classList.remove("hide");
   myMarks = {};
   var mine = (state.avail && state.avail[playerId]) || {};
   for (var k in mine) myMarks[k] = mine[k];
@@ -1337,6 +1344,22 @@ el("sit").addEventListener("click", function(){
   });
 });
 el("nameIn").addEventListener("keydown", function(e){ if (e.key === "Enter") el("sit").click(); });
+
+/* The wordmark is the way home from anywhere. If there is a live table the
+   landing page says so and offers the way back, rather than stranding you. */
+document.querySelectorAll("[data-home]").forEach(function(w){
+  w.addEventListener("click", function(){
+    show("join");
+    el("resume").classList.toggle("hide", !state);
+    window.scrollTo(0, 0);
+  });
+});
+el("backToTable").addEventListener("click", function(){
+  if (!state) return;
+  if (state.locked){ show("calledScreen"); renderCalled(); renderNotes(); }
+  else { show("tableScreen"); renderTable(); }
+  window.scrollTo(0, 0);
+});
 
 el("demo").addEventListener("click", function(){
   local = true; demo = true;
