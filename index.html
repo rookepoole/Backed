@@ -36,7 +36,11 @@ body{
 .wrap{max-width:720px;margin:0 auto;padding:clamp(18px,4vw,32px) clamp(16px,4vw,32px) 64px}
 .hide{display:none !important}
 
-.brandrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brandrow{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+#join .wordmark{font-family:var(--display);font-weight:800;font-size:clamp(30px,7.4vw,46px);
+  letter-spacing:-.035em;line-height:1;color:var(--gold);
+  text-shadow:0 2px 0 rgba(0,0,0,.22)}
+#join .brandrow{align-items:baseline;margin-bottom:2px}
 .what{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--felt-deep);background:var(--gold);border-radius:20px;padding:4px 10px;font-weight:500}
 .oneline{font-size:17px;color:var(--paper);margin:0;max-width:56ch;line-height:1.45}
@@ -419,6 +423,7 @@ footer a{color:var(--sage)}
     <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
       <h2 class="step" id="histTitle">Previous meetings</h2>
       <span class="realflag" style="margin-left:-4px">written by the ai notetaker</span>
+      <span class="hide" id="histSample" style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)">sample table</span>
       <button class="ghost" id="histToggle" type="button" aria-expanded="false">Show</button>
     </div>
     <div class="table hide" id="histBody"></div>
@@ -701,6 +706,56 @@ function viewOf(r){
 }
 
 /* ---------- local room ---------- */
+var DAYMS = 86400000;
+/* Three meetings this table has already run. Shown on the landing page so the
+   notetaker is visible without playing a round, and dealt into the demo table
+   so the record is continuous rather than starting empty. */
+var SAMPLE_MEETINGS = [
+  {
+    at: Date.now() - 19*DAYMS, label: "Wed 8:00pm",
+    chipsFor: 8, runnerUp: 3, settledIn: 22,
+    people: [ {name:"Mara",chips:3,attendance:"showed"}, {name:"Sam",chips:3,attendance:"showed"},
+              {name:"Dev",chips:2,attendance:"showed"} ],
+    notes: [ {name:"Sam",text:"We are not doing the rebrand this quarter. Parked until the pricing work lands."},
+             {name:"Mara",text:"Dev to draft the pricing page copy, Iz has final say on the numbers."} ],
+    facts: ["Called for Wed 8:00pm.",
+            "Won on 8 chips against 3, and closed early because nothing left in hand could catch it.",
+            "Settled 22 minutes after the first chip.",
+            "3 staked in: 3 turned up."],
+    summary: "The rebrand is parked until the pricing work is finished, so it is off this quarter. Dev drafts the pricing page copy and Iz has the final call on the numbers.",
+    summarised: true
+  },
+  {
+    at: Date.now() - 12*DAYMS, label: "Sun 6:30pm",
+    chipsFor: 6, runnerUp: 6, settledIn: 41, tie: true,
+    people: [ {name:"Iz",chips:3,attendance:"showed"}, {name:"Dev",chips:2,attendance:"showed"},
+              {name:"Sam",chips:1,attendance:"noshow"} ],
+    notes: [ {name:"Iz",text:"Pricing is three tiers, not five. Nobody could explain the middle two."},
+             {name:"Dev",text:"Copy is done. Waiting on Sam for the testimonial before it can go live."} ],
+    facts: ["Called for Sun 6:30pm.",
+            "Tied on 6 chips with 1 other time, and took the one fewest people had a conflict with.",
+            "Settled 41 minutes after the first chip.",
+            "3 staked in: 2 turned up, Sam did not."],
+    summary: "Pricing drops from five tiers to three, because nobody could explain the middle two. The copy is finished and now waits on Sam's testimonial before it can ship.",
+    summarised: true
+  },
+  {
+    at: Date.now() - 6*DAYMS, label: "Tue 6:30pm",
+    chipsFor: 11, runnerUp: 4, settledIn: 9,
+    people: [ {name:"Mara",chips:4,attendance:"showed"}, {name:"Dev",chips:3,attendance:"showed"},
+              {name:"Iz",chips:3,attendance:"showed"}, {name:"Sam",chips:1,attendance:"noshow"} ],
+    notes: [ {name:"Mara",text:"Agreed we ship the beta on the 12th, not the 5th. Two weeks was never real."},
+             {name:"Dev",text:"I'll do the migration script. Iz reviews it before it touches anything live."},
+             {name:"Iz",text:"Sam to confirm the venue by Thursday or we move it back to the office."} ],
+    facts: ["Called for Tue 6:30pm.",
+            "Won on 11 chips against 4, and closed early because nothing left in hand could catch it.",
+            "Settled 9 minutes after the first chip.",
+            "4 staked in: 3 turned up, Sam did not."],
+    summary: "The beta ships on the 12th rather than the 5th, since two weeks was never realistic. Dev is writing the migration script and Iz reviews it before it touches anything live. Sam needs to confirm the venue by Thursday, otherwise it moves back to the office.",
+    summarised: true
+  }
+];
+
 var LKEY = "wya:", lroom = null;
 function lload(c){ try { var raw = localStorage.getItem(LKEY+c); if (raw) return JSON.parse(raw); } catch(e){} return null; }
 function lsave(){ try { localStorage.setItem(LKEY+lroom.code, JSON.stringify(lroom)); } catch(e){} }
@@ -723,36 +778,10 @@ function seedBots(){
     p[1].forEach(function(pair){ lroom.stakes[slot.id]["b"+pair[0]] = pair[1]; });
   });
 
-  /* One meeting already in the book. Without it the notetaker and the whole
-     previous-meetings panel stay invisible until somebody plays a full round,
-     which on a demo nobody does - so the two things that make this a loop
-     rather than a poll never get seen. */
-  lroom.history = [{
-    at: Date.now() - 6 * 86400000,
-    label: "Tue 6:30pm",
-    chipsFor: 11, runnerUp: 4, settledIn: 9,
-    people: [
-      { name:"Mara", chips:4, attendance:"showed" },
-      { name:"Dev",  chips:3, attendance:"showed" },
-      { name:"Iz",   chips:3, attendance:"showed" },
-      { name:"Sam",  chips:1, attendance:"noshow" }
-    ],
-    notes: [
-      { name:"Mara", text:"Agreed we ship the beta on the 12th, not the 5th. Two weeks was never real.", at: Date.now() - 6*86400000 },
-      { name:"Dev",  text:"I'll do the migration script. Iz reviews it before it touches anything live.", at: Date.now() - 6*86400000 },
-      { name:"Iz",   text:"Sam to confirm the venue by Thursday or we move it back to the office.", at: Date.now() - 6*86400000 }
-    ],
-    facts: [
-      "Called for Tue 6:30pm.",
-      "Won on 11 chips against 4, and closed early because nothing left in hand could catch it.",
-      "Settled 9 minutes after the first chip.",
-      "4 staked in: 3 turned up, Sam did not."
-    ],
-    summary: "The beta ships on the 12th rather than the 5th, since two weeks was never realistic. " +
-             "Dev is writing the migration script and Iz reviews it before it touches anything live. " +
-             "Sam needs to confirm the venue by Thursday, otherwise it moves back to the office.",
-    summarised: true
-  }];
+  /* The book is not empty. Without this the notetaker and the whole record -
+     the two things that make this a loop rather than a poll - stay invisible
+     until somebody plays a full round, which on a demo nobody does. */
+  lroom.history = SAMPLE_MEETINGS.slice();
 }
 
 // The notetaker, solo-table edition: the same factual record composed from what
@@ -1157,8 +1186,8 @@ function renderNotes(){
 }
 
 var histOpened = false;
-function renderHistory(){
-  var h = (state && state.history) || [];
+function renderHistory(list){
+  var h = list || (state && state.history) || [];
   el("historyPanel").classList.toggle("hide", !h.length);
   if (!h.length) return;
   /* Open it once, unasked, the first time there is anything in it. */
@@ -1226,6 +1255,7 @@ function show(which){
 }
 function paint(){
   if (!state) return;
+  el("histSample").classList.toggle("hide", !!(state.history && state.history.length));
   renderHistory();
   if (state.locked){ show("calledScreen"); renderCalled(); renderNotes(); return; }
   if (screen === "syncScreen"){ return; }
@@ -1260,6 +1290,11 @@ code = (location.hash || "").replace(/^#/, "").toUpperCase().replace(/[^A-Z0-9]/
 var fresh = !code;
 if (!code){ code = newCode(); location.hash = code; }
 el("joinCode").textContent = code;
+/* Show the book straight away. A judge who never plays a round should still see
+   what the notetaker produces, so the sample renders on the landing page and is
+   replaced the moment a real room has a record of its own. */
+renderHistory(SAMPLE_MEETINGS);
+el("histSample").classList.remove("hide");
 el("joinRoomNote").textContent = fresh ? "· new table, this link is the invite" : "· joining an existing table";
 el("presetWrap").classList.toggle("hide", !fresh);
 
