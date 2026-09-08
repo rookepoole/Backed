@@ -1,1511 +1,184 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>when you available</title>
-<meta name="description" content="Sync your calendar so the board knows what's actually free. Then five chips, staked on the times you'll really turn up for.">
-<meta property="og:title" content="when you available">
-<meta property="og:description" content="Sync your calendar so the board knows what's actually free. Then five chips, staked on the times you'll really turn up for.">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
-<style>
-:root{
-  --felt:#14372A; --felt-deep:#0D241C; --felt-rail:#1D4A38; --felt-line:#2A5C47;
-  --paper:#EDE6D8; --ink:#16211C;
-  --sage:#8AA396; --sage-dim:#6B8A7B;
-  --gold:#D9A441; --gold-deep:#A87A25; --red:#C8433F; --amber:#C89A4A; --clear:#5FB08A;
-  --display:"Bricolage Grotesque",Georgia,serif;
-  --body:"Figtree","Helvetica Neue",Arial,sans-serif;
-  --mono:"DM Mono",SFMono-Regular,Consolas,monospace;
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{
-  background:var(--felt); color:var(--paper);
-  font-family:var(--body); font-size:16px; line-height:1.55;
-  -webkit-font-smoothing:antialiased; min-height:100vh;
-  background-image:
-    radial-gradient(120% 80% at 50% -10%, rgba(61,120,95,.30), rgba(20,55,42,0) 60%),
-    repeating-linear-gradient(38deg, rgba(255,255,255,.014) 0 2px, rgba(0,0,0,0) 2px 5px);
-  background-attachment:fixed;
-}
-.wrap{max-width:720px;margin:0 auto;padding:clamp(18px,4vw,32px) clamp(16px,4vw,32px) 64px}
-.hide{display:none !important}
-
-.brandrow{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
-#join .wordmark{font-family:var(--display);font-weight:800;font-size:clamp(30px,7.4vw,46px);
-  letter-spacing:-.035em;line-height:1;color:var(--gold);
-  text-shadow:0 2px 0 rgba(0,0,0,.22)}
-#join .brandrow{align-items:baseline;margin-bottom:2px}
-.what{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--felt-deep);background:var(--gold);border-radius:20px;padding:4px 10px;font-weight:500}
-.oneline{font-size:17px;color:var(--paper);margin:0;max-width:56ch;line-height:1.45}
-.oneline b{color:var(--gold);font-weight:600}
-.howrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:10px;margin:2px 0 2px}
-.how{background:rgba(255,255,255,.032);border:1px solid var(--felt-line);border-radius:11px;padding:13px 14px;
-  display:flex;flex-direction:column;gap:5px}
-.how .hn{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--gold);text-transform:uppercase}
-.how b{font-size:15px;font-weight:600;letter-spacing:-.01em;line-height:1.25}
-.how span.hd{color:var(--sage);font-size:13.5px;line-height:1.45}
-.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--sage);margin:0}
-.wordmark{font-family:var(--body);font-weight:700;font-size:17px;margin:0;letter-spacing:-.01em;
-  background:none;border:0;padding:0;color:var(--paper);cursor:pointer;text-align:left;font-family:var(--body)}
-.wordmark.home:hover{color:var(--gold)}
-#join .wordmark:hover{color:var(--gold)}
-h1.thesis{font-family:var(--display);font-weight:800;font-size:clamp(27px,6.6vw,42px);line-height:1.04;letter-spacing:-.03em;margin:0;text-wrap:balance}
-h1.thesis em{font-style:normal;color:var(--gold)}
-h2.step{font-family:var(--display);font-weight:800;font-size:clamp(20px,4.6vw,27px);line-height:1.1;letter-spacing:-.02em;margin:0;text-wrap:balance}
-.sub{color:var(--sage);margin:0;max-width:54ch}
-.stack{display:flex;flex-direction:column;gap:14px}
-.stack.tight{gap:9px}
-
-/* progress */
-.steps{display:flex;gap:6px;align-items:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--sage-dim);flex-wrap:wrap}
-.steps span.on{color:var(--gold)}
-.steps span.done{color:var(--sage)}
-.steps i{font-style:normal;opacity:.45}
-
-/* dead chat */
-.phone{background:var(--paper);color:var(--ink);border-radius:20px;padding:14px 13px 12px;
-  box-shadow:0 20px 40px rgba(0,0,0,.4),0 0 0 1px rgba(0,0,0,.26);max-width:360px;width:100%}
-.phone-top{display:flex;align-items:center;gap:8px;padding:0 4px 10px;border-bottom:1px solid rgba(22,33,28,.12);margin-bottom:12px}
-.phone-top .grp{width:24px;height:24px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-family:var(--mono);font-size:10px;color:var(--paper);flex:none}
-.phone-top .nm{font-weight:700;font-size:13.5px}
-.phone-top .ct{font-family:var(--mono);font-size:11px;color:#6E7873;margin-left:auto}
-.thread{display:flex;flex-direction:column;gap:6px}
-.msg{max-width:82%;padding:8px 12px;border-radius:16px;font-size:14px;line-height:1.4;width:fit-content}
-.msg.them{background:#E1D9C7;border-bottom-left-radius:5px}
-.msg.me{background:var(--felt-rail);color:var(--paper);align-self:flex-end;border-bottom-right-radius:5px;font-size:16px;font-weight:600}
-.stamp{font-family:var(--mono);font-size:10.5px;color:#6E7873;align-self:flex-end;padding-right:4px}
-.silence{font-family:var(--mono);font-size:10.5px;color:#6E7873;text-align:center;padding-top:8px;letter-spacing:.06em}
-.dots{display:flex;gap:4px;background:#E1D9C7;width:fit-content;padding:10px 13px;border-radius:16px;border-bottom-left-radius:5px;opacity:.55}
-.dots i{width:6px;height:6px;border-radius:50%;background:#6E7873;display:block;animation:pulse 1.5s ease-in-out infinite}
-.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
-
-.table{background:radial-gradient(120% 100% at 50% 0%, rgba(61,120,95,.2), rgba(0,0,0,0) 70%),var(--felt-deep);
-  border:1px solid var(--felt-line);border-radius:16px;padding:clamp(14px,3.4vw,20px);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 14px 30px rgba(0,0,0,.28)}
-
-.chip{width:22px;height:22px;border-radius:50%;background:var(--paper);
-  border:2px dashed rgba(22,33,28,.42);box-shadow:0 2px 4px rgba(0,0,0,.4);flex:none;display:block}
-.chip.sm{width:15px;height:15px;border-width:1.5px}
-.chip.spent{opacity:.16}
-
-.bank{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:13px;margin-bottom:15px;border-bottom:1px solid var(--felt-line)}
-.bank-label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--sage)}
-.bank-chips{display:flex;gap:5px;align-items:center;min-height:24px}
-.bank-count{font-family:var(--mono);font-size:12px;margin-left:auto;font-variant-numeric:tabular-nums}
-
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:8px}
-.slot{background:rgba(255,255,255,.032);border:1px solid var(--felt-line);border-radius:11px;
-  padding:10px 11px;text-align:left;color:var(--paper);font-family:var(--body);font-size:15px;cursor:pointer;
-  transition:background .13s,border-color .13s,transform .08s;display:flex;flex-direction:column;gap:8px;min-height:88px;
-  position:relative;overflow:hidden}
-.slot:hover:not(:disabled){background:rgba(255,255,255,.07);border-color:#3E7B60}
-.slot:active:not(:disabled){transform:translateY(1px)}
-.slot:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-.slot:disabled{cursor:default}
-.slot .when{font-weight:600;display:flex;justify-content:space-between;align-items:baseline;gap:8px;letter-spacing:-.01em}
-.slot .n{font-family:var(--mono);font-size:12px;color:var(--sage);font-variant-numeric:tabular-nums}
-.slot .pile{display:flex;flex-wrap:wrap;gap:3px;align-items:center;min-height:15px}
-.slot .tag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--sage-dim)}
-.slot::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent}
-.slot.clean::before{background:var(--clear)}
-.slot.maybe::before{background:var(--amber)}
-.slot.conflict::before{background:var(--red)}
-.slot.clean .tag{color:var(--clear)}
-.slot.maybe .tag{color:var(--amber)}
-.slot.conflict .tag{color:var(--red)}
-.slot.conflict{opacity:.6}
-.slot.lead{border-color:var(--gold-deep);background:rgba(217,164,65,.075)}
-.slot.lead::after{content:"leading";position:absolute;top:8px;right:9px;font-family:var(--mono);
-  font-size:9px;letter-spacing:.11em;text-transform:uppercase;color:var(--gold)}
-.slot.lead .n{color:var(--gold)}
-.slot.mine-busy{opacity:.42}
-.slot .by{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-deep)}
-.slot.lead .by{color:var(--gold)}
-.propose{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:13px;padding-top:13px;border-top:1px solid var(--felt-line)}
-input[type=datetime-local]{font-family:var(--body);font-size:15px;background:rgba(255,255,255,.04);color:var(--paper);
-  border:1px solid var(--felt-line);border-radius:9px;padding:10px 12px;-webkit-appearance:none;flex:1;min-width:190px;color-scheme:dark}
-input[type=datetime-local]:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
-
-/* availability marking mode */
-.slot.mk-free{border-color:var(--felt-line)}
-.slot.mk-maybe{border-color:var(--amber);background:rgba(200,154,74,.1)}
-.slot.mk-busy{border-color:var(--red);background:rgba(200,67,63,.12)}
-.slot .mark{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase}
-.slot.mk-free .mark{color:var(--sage-dim);opacity:.5}
-.slot.mk-maybe .mark{color:var(--amber)}
-.slot.mk-busy .mark{color:var(--red)}
-
-.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:14px}
-button.ghost{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
-  background:transparent;color:var(--sage);border:1px solid var(--felt-line);border-radius:7px;
-  padding:9px 13px;cursor:pointer;transition:color .13s,border-color .13s}
-button.ghost:hover:not(:disabled){color:var(--paper);border-color:#3E7B60}
-button.ghost:disabled{opacity:.4;cursor:default}
-button.solid{font-family:var(--body);font-weight:700;font-size:15px;background:var(--paper);color:var(--ink);
-  border:0;border-radius:9px;padding:12px 18px;cursor:pointer;transition:transform .08s}
-button.solid:active{transform:translateY(1px)}
-button.solid:disabled{opacity:.45;cursor:default}
-button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-.status{font-family:var(--mono);font-size:12px;color:var(--sage);margin:0;line-height:1.45;flex:1;min-width:180px}
-.status b{color:var(--paper);font-weight:500}
-.status.err{color:var(--red)}
-.status.good{color:var(--clear)}
-
-input[type=text]{font-family:var(--body);font-size:16px;background:rgba(255,255,255,.04);color:var(--paper);
-  border:1px solid var(--felt-line);border-radius:9px;padding:12px 14px;width:100%;-webkit-appearance:none}
-input[type=text]::placeholder{color:var(--sage-dim)}
-input[type=text]:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
-.way{border-top:1px solid var(--felt-line);padding:16px 0 4px}
-.way:first-of-type{border-top:0;padding-top:0}
-.wayhd{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:5px}
-.wayhd b{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:-.02em}
-.wn{font-family:var(--mono);font-size:11px;width:21px;height:21px;border-radius:50%;flex:none;
-  display:grid;place-items:center;background:var(--felt-line);color:var(--paper)}
-.wayd{color:var(--sage);font-size:14px;line-height:1.5;margin:0 0 11px;max-width:60ch}
-.wayd code{font-family:var(--mono);font-size:12.5px;color:var(--paper)}
-.wayd em{font-style:normal;color:var(--paper)}
-.realflag{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--sage-dim)}
-.pip{display:inline-block;width:9px;height:9px;border-radius:2px;vertical-align:middle;margin-right:1px}
-.pip.free{background:var(--felt-line)} .pip.mb{background:var(--amber)} .pip.bs{background:var(--red)}
-.gbtn{display:inline-flex;align-items:center;gap:8px}
-.gbtn svg{flex:none}
-.demoflag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--gold);border:1px solid var(--gold-deep);border-radius:20px;padding:4px 9px}
-.presets{display:flex;gap:6px;flex-wrap:wrap}
-.preset{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
-  background:transparent;color:var(--sage);border:1px solid var(--felt-line);border-radius:20px;padding:8px 14px;cursor:pointer}
-.preset[aria-pressed=true]{background:rgba(217,164,65,.14);border-color:var(--gold-deep);color:var(--gold)}
-.codeline{font-family:var(--mono);font-size:12px;color:var(--sage);display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0}
-.codeline b{color:var(--gold);font-weight:500;letter-spacing:.08em}
-
-.crew{display:flex;align-items:center;flex-wrap:wrap;margin-top:13px;padding-top:13px;border-top:1px solid var(--felt-line)}
-.av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:10px;
-  color:#0D241C;border:2px solid var(--felt-deep);margin-right:-7px;flex:none;font-weight:500;position:relative}
-.av.unsynced{opacity:.4}
-.crew .lbl{font-family:var(--mono);font-size:11px;color:var(--sage);margin-left:16px}
-
-.called{border:1px solid var(--gold-deep);border-radius:16px;padding:clamp(18px,4vw,24px);
-  background:linear-gradient(180deg,rgba(217,164,65,.13),rgba(217,164,65,.035)),var(--felt-deep);
-  display:flex;flex-direction:column;gap:16px}
-.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.19em;text-transform:uppercase;color:var(--gold);margin:0}
-.time{font-family:var(--display);font-weight:800;font-size:clamp(30px,8vw,50px);line-height:1;letter-spacing:-.03em;margin:0}
-.why{color:var(--sage);font-size:15px;margin:0;max-width:48ch}
-.roster{display:flex;flex-direction:column;border-top:1px solid rgba(217,164,65,.24)}
-.prow{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid rgba(217,164,65,.14)}
-.prow .who{display:flex;align-items:center;gap:9px;min-width:0}
-.prow .nm{font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.prow .stake{display:flex;gap:3px;margin-left:auto;flex:none}
-.prow .verdict{font-family:var(--mono);font-size:11px;flex:none;min-width:76px;text-align:right}
-.v-in{color:var(--sage)} .v-kept{color:var(--gold)} .v-burn{color:var(--red)}
-.prow.burn .stake .chip{opacity:.2;border-style:solid}
-
-.banner{border-left:2px solid var(--gold-deep);padding:8px 0 8px 13px;font-size:13.5px;color:var(--sage);margin:0}
-.banner b{color:var(--paper)}
-.banner.warn{border-left-color:var(--red)}
-.legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--sage-dim);margin:0}
-.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
-textarea{font-family:var(--body);font-size:15px;background:rgba(255,255,255,.04);color:var(--paper);
-  border:1px solid var(--felt-line);border-radius:9px;padding:11px 13px;width:100%;resize:vertical;min-height:74px;-webkit-appearance:none}
-textarea::placeholder{color:var(--sage-dim)}
-textarea:focus{outline:2px solid var(--gold);outline-offset:1px;border-color:transparent}
-.notes{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
-.note{display:flex;gap:9px;align-items:flex-start;font-size:14.5px;line-height:1.5}
-.note .nb{font-family:var(--mono);font-size:11px;color:var(--sage);flex:none;min-width:58px;padding-top:2px}
-.note .nt{color:var(--paper)}
-.mtg{border-top:1px solid var(--felt-line);padding:14px 0;display:flex;flex-direction:column;gap:8px}
-.mtg:first-child{border-top:0}
-.mtg .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.mtg .ttl{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-.02em}
-.mtg .ago{font-family:var(--mono);font-size:11px;color:var(--sage-dim);margin-left:auto}
-.mtg .facts{color:var(--sage);font-size:14px;margin:0;line-height:1.5}
-.mtg .sum{border-left:2px solid var(--gold-deep);padding:6px 0 6px 12px;font-size:14.5px;color:var(--paper);white-space:pre-wrap;margin:0}
-.mtg .nosum{font-family:var(--mono);font-size:11px;color:var(--sage-dim);margin:0}
-.mtg .att{display:flex;gap:6px;flex-wrap:wrap;font-family:var(--mono);font-size:11px}
-.mtg .att span{border:1px solid var(--felt-line);border-radius:20px;padding:3px 9px;color:var(--sage)}
-.mtg .att span.up{border-color:var(--gold-deep);color:var(--gold)}
-.mtg .att span.no{border-color:var(--red);color:var(--red)}
-footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--felt-line);font-family:var(--mono);font-size:11px;color:var(--sage-dim);line-height:1.7}
-footer a{color:var(--sage)}
-@media(max-width:760px){
-  /* Apple's 44px floor. The primary CTA sat at 42 and the demo button at 34. */
-  button.solid,button.ghost,.gbtn,.preset,input[type=text],input[type=datetime-local]{min-height:44px}
-  .howrow{grid-template-columns:1fr}
-}
-@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important}}
-@keyframes pulse{0%,100%{opacity:.3}50%{opacity:.75}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="BACKED turns group availability into a real commitment: back the time you'll actually protect." />
+  <meta property="og:title" content="BACKED — commitment-first group scheduling" />
+  <meta property="og:description" content="Don't vote for when you're free. Back the time you'll actually protect." />
+  <title>BACKED — commitment-first scheduling</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="wrap">
+  <div class="noise" aria-hidden="true"></div>
 
-  <!-- ========== 1 · JOIN ========== -->
-  <section id="join" class="stack">
-    <div class="brandrow">
-      <button class="wordmark home" type="button" data-home>when you available</button>
-      <span class="what">group scheduler</span>
-    </div>
-    <p class="oneline">Everyone syncs their calendar, the board shows the times that are
-      <b>genuinely clear for all of you</b>, and the group converges on one &mdash; then puts
-      something on the line so the meeting actually happens.</p>
+  <main>
+    <section id="landing" class="landing">
+      <nav class="topbar">
+        <a class="brand" href="./" aria-label="BACKED home"><span>BACKED</span><i>β</i></a>
+        <div class="protocol"><span class="live-dot"></span> WEBRTC / NO ACCOUNTS</div>
+      </nav>
 
-    <div class="phone">
-      <div class="phone-top"><span class="grp">5</span><span class="nm">the group chat</span><span class="ct">Thu</span></div>
-      <div class="thread">
-        <div class="msg them">ok we're actually doing this</div>
-        <div class="msg them">someone pick a day</div>
-        <div class="msg me">when you available</div>
-        <div class="stamp">Delivered · 9:04 AM</div>
-        <div class="dots"><i></i><i></i><i></i></div>
-        <div class="silence">no reply · 2 days</div>
-      </div>
-    </div>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <div class="kicker">GROUP MEETING COORDINATOR / REMIX 01</div>
+          <h1>Availability is cheap.<br><em>Commitment isn’t.</em></h1>
+          <p class="lede">Stop asking when everyone is free. Give each person five units of backing and make them spend it on the times they’ll actually protect.</p>
+          <div class="proof-strip">
+            <div><b>01</b><span>Mark real conflicts</span></div>
+            <div><b>02</b><span>Back the best times</span></div>
+            <div><b>03</b><span>Lock when the math says it’s inevitable</span></div>
+          </div>
+        </div>
 
-    <h1 class="thesis">A green box costs nothing.<br>That's why <em>nobody shows up.</em></h1>
-    <p class="sub">Every other tool stops once it has found the overlap. This one keeps going.</p>
+        <div class="launch-card">
+          <div class="launch-head">
+            <span id="launchMode">CREATE A ROOM</span>
+            <strong id="landingCode">------</strong>
+          </div>
 
-    <div class="howrow">
-      <div class="how"><span class="hn">Step 1</span><b>Everyone syncs a calendar</b>
-        <span class="hd">Google, a secret .ics link, an .ics file, or just tap the times. It reads busy blocks only &mdash; never titles or guests.</span></div>
-      <div class="how"><span class="hn">Step 2</span><b>The board finds the clear times</b>
-        <span class="hd">One person's conflict is the table's conflict, so a green slot is green for everybody. Anyone can propose a time of their own.</span></div>
-      <div class="how"><span class="hn">Step 3</span><b>Stake chips, then show up</b>
-        <span class="hd">Five chips on the times you'll really attend. It closes itself when nothing can catch the leader. Turn up and they come back; don't and they burn.</span></div>
-    </div>
+          <label class="field">
+            <span>YOUR NAME</span>
+            <input id="nameInput" maxlength="24" autocomplete="nickname" placeholder="Rooke" />
+          </label>
 
-    <div class="table stack tight">
-      <p class="codeline">Room <b id="joinCode">—</b> <span id="joinRoomNote"></span></p>
-      <label for="nameIn" class="eyebrow">Your name</label>
-      <input type="text" id="nameIn" maxlength="24" placeholder="who's staking" autocomplete="nickname">
-      <div id="presetWrap" class="stack tight">
-        <span class="eyebrow">Times on the table</span>
-        <div class="presets">
-          <button class="preset" type="button" data-preset="this" aria-pressed="true">This week</button>
-          <button class="preset" type="button" data-preset="next" aria-pressed="false">Next week</button>
-          <button class="preset" type="button" data-preset="weekend" aria-pressed="false">Weekends</button>
+          <label class="field" id="purposeField">
+            <span>WHAT ARE WE TRYING TO GET DONE?</span>
+            <textarea id="purposeInput" maxlength="120" rows="3" placeholder="Ship the launch before Friday"></textarea>
+          </label>
+
+          <div id="presetField" class="field">
+            <span>TIMES TO START WITH</span>
+            <div class="segmented" id="presetButtons">
+              <button type="button" data-preset="this" class="active">This week</button>
+              <button type="button" data-preset="next">Next week</button>
+              <button type="button" data-preset="weekend">Weekends</button>
+            </div>
+          </div>
+
+          <button id="primaryBtn" class="primary" type="button">CREATE P2P ROOM <span>↗</span></button>
+          <div id="launchStatus" class="status-line">Your browser becomes the room. No database, no login.</div>
+
+          <button id="demoBtn" class="demo-link" type="button">Open judge-ready demo →</button>
         </div>
       </div>
-      <div class="row">
-        <button class="solid" id="sit" type="button">Take a seat</button>
-        <p class="status" id="joinStatus"></p>
+
+      <div class="thesis-grid">
+        <article><span class="num">01</span><h2>Conflict is private-ish.</h2><p>Calendar files are parsed locally. The room only receives “busy” or “maybe” for the candidate times — not event titles, guests, or descriptions.</p></article>
+        <article><span class="num">02</span><h2>Backing is scarce.</h2><p>Everyone gets five units. Stack all five on one time or spread them out. A casual green checkbox can’t express that difference.</p></article>
+        <article><span class="num">03</span><h2>The room stops asking.</h2><p>The leading time locks as soon as its margin is larger than every unit of backing still unspent. Waiting longer literally cannot change the result.</p></article>
       </div>
-    </div>
+    </section>
 
-    <p class="banner hide" id="resume"><b>You&rsquo;re already at a table.</b>
-      <button class="ghost" id="backToTable" type="button" style="margin-left:6px">Back to the board</button></p>
-
-    <p class="banner"><b>Just looking?</b> <button class="ghost" id="demo" type="button" style="margin-left:6px">Deal a demo table</button> — four people already synced and staked, so you can see the whole thing without waiting for friends.</p>
-  </section>
-
-  <!-- ========== 2 · SYNC ========== -->
-  <section id="syncScreen" class="stack hide">
-    <button class="wordmark home" type="button" data-home>when you available</button>
-    <p class="steps"><span class="done">1 seat</span><i>›</i><span class="on">2 sync</span><i>›</i><span>3 stake</span><i>›</i><span>4 show up</span></p>
-
-    <h2 class="step">What can&rsquo;t you make?</h2>
-    <p class="sub">The board only needs your conflicts. Everything else stays open, and staying open is not a promise &mdash; that part is the chips. Busy blocks only, never titles or guests.</p>
-
-    <div class="table">
-      <p class="eyebrow" style="margin-bottom:14px">Three ways. Pick one, or none.</p>
-
-      <div class="way">
-        <div class="wayhd"><span class="wn">1</span><b>Google Calendar</b><span class="demoflag">demo</span></div>
-        <p class="wayd">Doesn&rsquo;t contact Google and asks you for nothing. Fills in a plausible week of busy blocks so you can see what a synced board looks like.</p>
-        <div class="row" style="margin-top:0">
-          <button class="ghost gbtn" id="gsign" type="button">
-            <svg viewBox="0 0 18 18" width="15" height="15" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.3-.2-1.9H9v3.5h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/><path fill="#34A853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.9 10.7a5.4 5.4 0 0 1 0-3.4V5H.9a9 9 0 0 0 0 8l3-2.3z"/><path fill="#EA4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6z"/></svg>
-            <span id="gsignLabel">Run the demo sync</span>
-          </button>
-          <button class="ghost hide" id="gout" type="button">Clear it</button>
+    <section id="roomScreen" class="room-screen hidden">
+      <header class="room-header">
+        <button class="brand brand-button" id="homeBtn" type="button"><span>BACKED</span><i>β</i></button>
+        <div class="room-meta">
+          <div class="room-code">ROOM <strong id="roomCode">------</strong></div>
+          <div class="network-pill"><span id="netDot"></span><b id="netText">LOCAL</b></div>
+          <button id="shareBtn" class="text-button" type="button">COPY INVITE</button>
         </div>
-        <p class="status" id="gStatus"></p>
-      </div>
+      </header>
 
-      <div class="way">
-        <div class="wayhd"><span class="wn">2</span><b>A calendar file</b><span class="realflag">reads your real calendar</span></div>
-        <p class="wayd">Export a <code>.ics</code> from Google, Apple or Outlook and drop it in. It is parsed here in your browser and never uploaded &mdash; no server sees it, because there is no server in this path at all.</p>
-        <div class="row" style="margin-top:0">
-          <button class="ghost" id="pickFile" type="button">Choose an .ics file</button>
-          <input type="file" id="icsFile" accept=".ics,text/calendar" class="hide">
+      <section class="mission-card">
+        <div>
+          <span class="eyebrow">ROUND <b id="roundNo">1</b> / PURPOSE</span>
+          <h2 id="roomPurpose">—</h2>
         </div>
-        <p class="status" id="syncStatus"></p>
+        <div class="metrics">
+          <div><span>PEOPLE</span><b id="peopleMetric">1</b></div>
+          <div><span>LEADER</span><b id="leaderMetric">0</b></div>
+          <div><span>GAP</span><b id="gapMetric">0</b></div>
+          <div><span>UNSPENT</span><b id="unspentMetric">5</b></div>
+        </div>
+      </section>
+
+      <section id="decisionBanner" class="decision-banner hidden">
+        <div>
+          <span class="eyebrow">DECISION LOCKED</span>
+          <h2 id="decisionTime">—</h2>
+          <p id="decisionReason">—</p>
+        </div>
+        <div class="attendance-box">
+          <span>AFTER THE MEETING</span>
+          <div>
+            <button id="showedBtn" type="button">I SHOWED UP</button>
+            <button id="missedBtn" type="button">I MISSED IT</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="workspace">
+        <aside class="rail">
+          <section class="rail-card commitment-card">
+            <div class="rail-title"><span id="budgetLabel">YOUR BACKING</span><b id="budgetText">5 / 5</b></div>
+            <div id="budgetTokens" class="budget-tokens" aria-label="Backing remaining"></div>
+            <p>Spend these only on times you’ll actively protect. A conflict automatically pulls your backing off that time.</p>
+            <button id="unbackBtn" class="secondary wide" type="button">TAKE MY BACKING BACK</button>
+          </section>
+
+          <section class="rail-card">
+            <div class="rail-title"><span>CALENDAR FILTER</span><b>LOCAL</b></div>
+            <p>Import an <code>.ics</code> file. It never leaves this browser; only the resulting busy/maybe marks are shared.</p>
+            <input id="icsInput" class="hidden" type="file" accept=".ics,text/calendar" />
+            <button id="icsBtn" class="secondary wide" type="button">IMPORT .ICS</button>
+            <div id="calendarStatus" class="mini-status"></div>
+          </section>
+
+          <section class="rail-card">
+            <div class="rail-title"><span>ROOM</span><b id="participantCount">1</b></div>
+            <div id="participants" class="participants"></div>
+          </section>
+        </aside>
+
+        <div class="board-column">
+          <div class="board-head">
+            <div>
+              <span class="eyebrow">CANDIDATE TIMES</span>
+              <h3>Back what you mean.</h3>
+            </div>
+            <div class="legend">
+              <span><i class="clean"></i>clear</span><span><i class="maybe"></i>maybe</span><span><i class="busy"></i>conflict</span>
+            </div>
+          </div>
+
+          <div id="slotGrid" class="slot-grid"></div>
+
+          <div class="propose-row">
+            <label><span>ADD A BETTER TIME</span><input id="customAt" type="datetime-local" /></label>
+            <button id="customBtn" class="secondary" type="button">PUT IT ON THE BOARD</button>
+          </div>
+
+          <div id="actionStatus" class="action-status"></div>
+        </div>
       </div>
 
-      <div class="way">
-        <div class="wayhd"><span class="wn">3</span><b>Just tap the times</b><span class="realflag">no calendar at all</span></div>
-        <p class="wayd">You only have to flag what you <em>can&rsquo;t</em> do. Tap once for <span class="pip bs"></span> <em>can&rsquo;t make it</em>, twice for <span class="pip mb"></span> <em>only at a push</em>, a third time to clear it. Anything you leave alone stays open &mdash; which is not the same as promising to be there. That part is the chips.</p>
-        <div class="grid" id="markGrid"></div>
-        <p class="status" id="markStatus"></p>
-      </div>
-
-      <div class="row" style="border-top:1px solid var(--felt-line);padding-top:16px;margin-top:4px">
-        <button class="solid" id="doneSync" type="button">Done, take me to the table</button>
-        <button class="ghost" id="skipSync" type="button">Skip &mdash; I&rsquo;ll just stake</button>
-      </div>
-    </div>
-
-    <p class="banner"><b>All of this is optional.</b> Skip it and you go straight to the chips — the board just won't know who's already booked.</p>
-  </section>
-
-  <!-- ========== 3 · TABLE ========== -->
-  <section id="tableScreen" class="stack hide">
-    <button class="wordmark home" type="button" data-home>when you available</button>
-    <p class="steps"><span class="done">1 seat</span><i>›</i><span class="done">2 sync</span><i>›</i><span class="on">3 stake</span><i>›</i><span>4 show up</span></p>
-    <p class="codeline">Room <b id="tCode">—</b>
-      <button class="ghost" id="copy" type="button">Copy invite</button>
-      <button class="ghost" id="backToSync" type="button">Change my calendar</button>
-      <span id="demoTag"></span>
-    </p>
-    <p id="offline" class="banner warn hide"><b>Solo table.</b> The room service isn't reachable, so this board lives in this browser only. Everything works, nobody else can see it.</p>
-    <p id="suggest" class="banner"></p>
-
-    <div class="table">
-      <div class="bank">
-        <span class="bank-label">Your chips</span>
-        <span class="bank-chips" id="bank"></span>
-        <span class="bank-count" id="bankCount">—</span>
-      </div>
-      <div class="grid" id="grid"></div>
-      <p class="legend" style="margin-top:12px">
-        <span><i style="background:var(--clear)"></i>clear for everyone</span>
-        <span><i style="background:var(--amber)"></i>someone's a maybe</span>
-        <span><i style="background:var(--red)"></i>someone's booked</span>
-      </p>
-      <div class="propose">
-        <label for="propAt" class="eyebrow" style="width:100%">None of these work? Put your own time on the table</label>
-        <input type="datetime-local" id="propAt">
-        <button class="ghost" id="propose" type="button">Propose it</button>
-      </div>
-      <p class="status" id="pStatus" style="margin-top:8px"></p>
-      <div class="row">
-        <button class="ghost" id="takeBack" type="button">Take them back</button>
-        <p class="status" id="tStatus"></p>
-      </div>
-      <div class="crew" id="crew"></div>
-    </div>
-  </section>
-
-  <!-- ========== 4 · CALLED ========== -->
-  <section id="calledScreen" class="stack hide">
-    <button class="wordmark home" type="button" data-home>when you available</button>
-    <p class="steps"><span class="done">1 seat</span><i>›</i><span class="done">2 sync</span><i>›</i><span class="done">3 stake</span><i>›</i><span class="on">4 show up</span></p>
-    <div class="called">
-      <div>
-        <p class="kicker">It closed itself</p>
-        <p class="time" id="calledTime">—</p>
-      </div>
-      <p class="why" id="calledWhy"></p>
-      <div class="roster" id="roster"></div>
-      <div class="row">
-        <button class="ghost" id="showed" type="button">I showed up</button>
-        <button class="ghost" id="noshow" type="button">I didn't</button>
-        <button class="ghost" id="copySum" type="button">Copy for the chat</button>
-      </div>
-      <p class="status" id="cStatus"></p>
-    </div>
-
-    <div class="table stack tight">
-      <span class="eyebrow">Notes · the notetaker reads these</span>
-      <ul class="notes" id="noteList"></ul>
-      <textarea id="noteIn" maxlength="1000" placeholder="what got decided, who's doing what"></textarea>
-      <div class="row" style="margin-top:2px">
-        <button class="ghost" id="addNote" type="button">Add note</button>
-        <button class="ghost" id="wrapUp" type="button">Wrap up and deal the next one</button>
-        <p class="status" id="nStatus"></p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== PREVIOUS MEETINGS ========== -->
-  <section id="historyPanel" class="stack hide" style="margin-top:34px">
-    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
-      <h2 class="step" id="histTitle">Previous meetings</h2>
-      <span class="realflag" style="margin-left:-4px">written by the ai notetaker</span>
-      <span class="hide" id="histSample" style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)">sample table</span>
-      <button class="ghost" id="histToggle" type="button" aria-expanded="false">Show</button>
-    </div>
-    <div class="table hide" id="histBody"></div>
-  </section>
-
-  <footer>
-    when you available · built for Cortex Research Group, Season 2 Episode 5<br>
-    <a href="https://github.com/aunysillyme/wya">source</a>
-  </footer>
-</div>
-
-<script>
-// Minimal iCalendar reader. Enough to answer one question: which of the times
-// on the board is this person already booked for?
-//
-// Deliberate limits, stated rather than hidden:
-//   - all-day events become "maybe", never "busy" (a birthday is not a conflict)
-//   - TZID and floating times are read as the viewer's local time; only the
-//     trailing-Z UTC form is converted exactly
-//   - RRULE handles FREQ=DAILY/WEEKLY with INTERVAL, BYDAY, COUNT and UNTIL.
-//     Monthly and yearly recurrence is ignored.
-//   - CANCELLED events and TRANSP:TRANSPARENT ("free") events are skipped
-(function (root) {
-  "use strict";
-
-  var DAY = 86400000;
-  var DAYS = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
-
-  // RFC 5545 folds long lines with a leading space or tab.
-  function unfold(text) {
-    return text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/\n[ \t]/g, "");
-  }
-
-  function parseWhen(raw, params) {
-    if (!raw) return null;
-    var v = raw.trim();
-    var m = v.match(/^(\d{4})(\d{2})(\d{2})(?:T(\d{2})(\d{2})(\d{2})(Z)?)?$/);
-    if (!m) return null;
-    var y = +m[1], mo = +m[2] - 1, d = +m[3];
-    var allDay = !m[4] || (params && /VALUE=DATE(?!-TIME)/i.test(params));
-    if (allDay) return { t: new Date(y, mo, d).getTime(), allDay: true };
-    var hh = +m[4], mi = +m[5], ss = +m[6];
-    if (m[7]) return { t: Date.UTC(y, mo, d, hh, mi, ss), allDay: false };
-    return { t: new Date(y, mo, d, hh, mi, ss).getTime(), allDay: false };
-  }
-
-  function parseRule(rrule) {
-    var out = {};
-    String(rrule).split(";").forEach(function (bit) {
-      var kv = bit.split("=");
-      if (kv.length === 2) out[kv[0].toUpperCase()] = kv[1];
-    });
-    return out;
-  }
-
-  // Project a recurring event forward, but only across the window we care about.
-  function expand(ev, from, to) {
-    var out = [];
-    var len = Math.max(ev.end - ev.start, 0);
-    if (!ev.rrule) {
-      if (ev.end > from && ev.start < to) out.push({ start: ev.start, end: ev.end, allDay: ev.allDay });
-      return out;
-    }
-    var r = parseRule(ev.rrule);
-    var freq = (r.FREQ || "").toUpperCase();
-    if (freq !== "DAILY" && freq !== "WEEKLY") {
-      if (ev.end > from && ev.start < to) out.push({ start: ev.start, end: ev.end, allDay: ev.allDay });
-      return out;
-    }
-    var interval = Math.max(1, parseInt(r.INTERVAL, 10) || 1);
-    var until = r.UNTIL ? (parseWhen(r.UNTIL) || {}).t : null;
-    var count = r.COUNT ? parseInt(r.COUNT, 10) : null;
-    var byday = r.BYDAY ? r.BYDAY.split(",").map(function (d) {
-      return DAYS[d.replace(/^[-+]?\d+/, "").toUpperCase()];
-    }).filter(function (d) { return d !== undefined; }) : null;
-
-    var step = freq === "DAILY" ? DAY * interval : DAY * 7 * interval;
-    var made = 0;
-    // Never walk forever: the board is days wide, so cap the projection.
-    for (var t = ev.start, guard = 0; guard < 800; guard++, t += step) {
-      if (until !== null && t > until) break;
-      if (count !== null && made >= count) break;
-      var occ = [t];
-      if (freq === "WEEKLY" && byday && byday.length) {
-        var weekStart = t - ((new Date(t).getDay() + 7) % 7) * DAY;
-        occ = byday.map(function (d) { return weekStart + d * DAY + (t - new Date(t).setHours(0, 0, 0, 0)); });
-      }
-      for (var i = 0; i < occ.length; i++) {
-        var s = occ[i], e = s + len;
-        if (s < ev.start) continue;
-        if (until !== null && s > until) continue;
-        made++;
-        if (e > from && s < to) out.push({ start: s, end: e, allDay: ev.allDay });
-      }
-      if (t > to + step) break;
-    }
-    return out;
-  }
-
-  // Returns busy/maybe windows overlapping [from, to)
-  function parse(text, from, to) {
-    var lines = unfold(String(text || "")).split("\n");
-    var events = [], cur = null;
-
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i];
-      if (/^BEGIN:VEVENT/i.test(line)) { cur = {}; continue; }
-      if (/^END:VEVENT/i.test(line)) {
-        if (cur && cur.start) {
-          if (!cur.end) cur.end = cur.start + (cur.allDay ? DAY : 3600000);
-          if (!cur.skip) events.push(cur);
-        }
-        cur = null;
-        continue;
-      }
-      if (!cur) continue;
-
-      var c = line.indexOf(":");
-      if (c < 0) continue;
-      var left = line.slice(0, c), value = line.slice(c + 1);
-      var semi = left.indexOf(";");
-      var key = (semi < 0 ? left : left.slice(0, semi)).toUpperCase();
-      var params = semi < 0 ? "" : left.slice(semi + 1);
-
-      if (key === "DTSTART") {
-        var a = parseWhen(value, params);
-        if (a) { cur.start = a.t; cur.allDay = a.allDay; }
-      } else if (key === "DTEND") {
-        var b = parseWhen(value, params);
-        if (b) cur.end = b.t;
-      } else if (key === "RRULE") {
-        cur.rrule = value;
-      } else if (key === "STATUS" && /CANCELLED/i.test(value)) {
-        cur.skip = true;
-      } else if (key === "TRANSP" && /TRANSPARENT/i.test(value)) {
-        cur.skip = true; // marked "free" in the calendar, so not a conflict
-      }
-    }
-
-    var windows = [];
-    events.forEach(function (ev) {
-      expand(ev, from, to).forEach(function (w) { windows.push(w); });
-    });
-    return windows;
-  }
-
-  // Map busy windows onto the board. Overlap of any real event = busy;
-  // an all-day event only ever softens a slot to maybe.
-  function applyTo(slots, windows) {
-    var out = {};
-    slots.forEach(function (s) {
-      var state = "free";
-      for (var i = 0; i < windows.length; i++) {
-        var w = windows[i];
-        if (w.end > s.startsAt && w.start < s.endsAt) {
-          if (w.allDay) { if (state === "free") state = "maybe"; }
-          else { state = "busy"; break; }
-        }
-      }
-      if (state !== "free") out[s.id] = state;
-    });
-    return out;
-  }
-
-  root.ICS = { parse: parse, applyTo: applyTo, unfold: unfold };
-})(typeof module !== "undefined" && module.exports ? module.exports : (typeof window !== "undefined" ? window : globalThis));
-
-</script>
-<script>
-(function(){
-"use strict";
-
-var API = "https://whenyouavailable-room.aunysillyme.workers.dev";
-var qs = new URLSearchParams(location.search);
-if (qs.get("api")) API = qs.get("api").replace(/\/+$/, "");
-
-var CHIPS = 5, SLOT_MIN = 90;
-var COLORS = ["#E8DFC8","#C8433F","#2E6BA8","#8B5E9E","#3F8F7A","#D9A441","#C77B4A","#5C8FA8"];
-var BOTS = ["Mara","Dev","Sam","Iz"];
-/* Unmarked is the resting state, NOT "free". Saying you are free should
-   cost a chip, not a default. The grid only ever records a conflict. */
-var CYCLE = { free:"busy", busy:"maybe", maybe:"free" };
-
-var el = function(id){ return document.getElementById(id); };
-var state = null, playerId = null, code = null, preset = "this";
-var local = false, demo = false, timer = null, busy = false;
-var myMarks = {};   // slotId -> "maybe" | "busy"   (free is simply absent)
-
-/* ---------- the board's times ---------- */
-function labelFor(t){
-  return t.toLocaleDateString(undefined,{weekday:"short"}) + " " +
-         t.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}).replace(/\s/g,"").toLowerCase();
-}
-function makeSlots(kind){
-  var out = [], base = new Date(), bands = [[18,30],[20,0]], days = [], i, k, n = 0;
-  base.setHours(0,0,0,0);
-  if (kind === "weekend"){
-    var c = new Date(base);
-    while (days.length < 6){
-      c.setDate(c.getDate() + 1);
-      if (c.getDay() === 6 || c.getDay() === 0) days.push(new Date(c));
-    }
-  } else {
-    var off = kind === "next" ? 8 : 1;
-    for (i = 0; i < 6; i++){ var x = new Date(base); x.setDate(x.getDate() + off + i); days.push(x); }
-  }
-  for (i = 0; i < days.length; i++){
-    for (k = 0; k < bands.length; k++){
-      var t = new Date(days[i]); t.setHours(bands[k][0], bands[k][1], 0, 0);
-      out.push({
-        id: "s" + (n++),
-        label: t.toLocaleDateString(undefined,{weekday:"short"}) + " " +
-               t.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}).replace(/\s/g,"").toLowerCase(),
-        startsAt: t.getTime(),
-        endsAt: t.getTime() + SLOT_MIN*60000
-      });
-    }
-  }
-  return out;
-}
-
-/* ---------- maths mirrored from the worker, so a solo table behaves identically ---------- */
-function totalsOf(r){
-  return r.slots.map(function(s){
-    var m = r.stakes[s.id] || {}, n = 0, k;
-    for (k in m) n += m[k];
-    return { id:s.id, label:s.label, n:n };
-  });
-}
-function spentBy(r,pid){ var n=0,s; for (s in r.stakes) n += r.stakes[s][pid]||0; return n; }
-function unspentOf(r){ var u=0,p; for (p in r.players) u += Math.max(0, r.players[p].chips - spentBy(r,p)); return u; }
-function availOf(r){
-  var out = {};
-  r.slots.forEach(function(s){
-    var b = 0, m = 0, p;
-    for (p in r.players){
-      var v = (r.avail[p]||{})[s.id] || "free";
-      if (v === "busy") b++; else if (v === "maybe") m++;
-    }
-    out[s.id] = { state: b ? "conflict" : (m ? "maybe" : "clean"), busy:b, maybe:m };
-  });
-  return out;
-}
-function settle(r){
-  if (r.locked) return r;
-  var t = totalsOf(r).sort(function(a,b){ return b.n-a.n; });
-  if (t.length < 2 || t[0].n === 0) return r;
-  var un = unspentOf(r);
-  if (t[0].n - t[1].n > un){
-    r.locked = true; r.winner = t[0].id; r.lockedAt = Date.now(); r.decidedBy = "lead";
-    return r;
-  }
-  /* Every chip spent and still level: break it, or the board sits open forever
-     with nobody holding a chip that could move it. */
-  if (un === 0){
-    var top = t[0].n, tied = t.filter(function(x){ return x.n === top; }).map(function(x){ return x.id; });
-    if (tied.length < 2) return r;
-    var av = availOf(r), byId = {};
-    r.slots.forEach(function(x){ byId[x.id] = x; });
-    tied.sort(function(x,y){
-      var a = av[x], b = av[y];
-      if (a.busy !== b.busy) return a.busy - b.busy;
-      if (a.maybe !== b.maybe) return a.maybe - b.maybe;
-      return byId[x].startsAt - byId[y].startsAt;
-    });
-    r.locked = true; r.winner = tied[0]; r.lockedAt = Date.now();
-    r.decidedBy = "tie"; r.tiedWith = tied.length;
-  }
-  return r;
-}
-function viewOf(r){
-  var t = totalsOf(r), s = t.slice().sort(function(a,b){ return b.n-a.n; }), av = availOf(r);
-  return { code:r.code, slots:r.slots, players:r.players, stakes:r.stakes, avail:r.avail,
-    availability:av, clean:r.slots.filter(function(x){ return av[x.id].state==="clean"; }).map(function(x){ return x.id; }),
-    synced:Object.keys(r.players).filter(function(p){ return r.players[p].synced; }).length,
-    playerCount:Object.keys(r.players).length,
-    locked:r.locked, winner:r.winner, decidedBy:r.decidedBy||null, tiedWith:r.tiedWith||0, attendance:r.attendance, chips:CHIPS, totals:t,
-    notes:r.notes||[], history:r.history||[], firstChipAt:r.firstChipAt||null,
-    unspent:unspentOf(r), gap: s.length>1 ? s[0].n-s[1].n : 0, leader: s.length && s[0].n>0 ? s[0].id : null };
-}
-
-/* ---------- local room ---------- */
-var DAYMS = 86400000;
-/* Three meetings this table has already run. Shown on the landing page so the
-   notetaker is visible without playing a round, and dealt into the demo table
-   so the record is continuous rather than starting empty. */
-var SAMPLE_MEETINGS = [
-  {
-    at: Date.now() - 19*DAYMS, label: "Wed 8:00pm",
-    chipsFor: 8, runnerUp: 3, settledIn: 22,
-    people: [ {name:"Mara",chips:3,attendance:"showed"}, {name:"Sam",chips:3,attendance:"showed"},
-              {name:"Dev",chips:2,attendance:"showed"} ],
-    notes: [ {name:"Sam",text:"We are not doing the rebrand this quarter. Parked until the pricing work lands."},
-             {name:"Mara",text:"Dev to draft the pricing page copy, Iz has final say on the numbers."} ],
-    facts: ["Called for Wed 8:00pm.",
-            "Won on 8 chips against 3, and closed early because nothing left in hand could catch it.",
-            "Settled 22 minutes after the first chip.",
-            "3 staked in: 3 turned up."],
-    summary: "The rebrand is parked until the pricing work is finished, so it is off this quarter. Dev drafts the pricing page copy and Iz has the final call on the numbers.",
-    summarised: true
-  },
-  {
-    at: Date.now() - 12*DAYMS, label: "Sun 6:30pm",
-    chipsFor: 6, runnerUp: 6, settledIn: 41, tie: true,
-    people: [ {name:"Iz",chips:3,attendance:"showed"}, {name:"Dev",chips:2,attendance:"showed"},
-              {name:"Sam",chips:1,attendance:"noshow"} ],
-    notes: [ {name:"Iz",text:"Pricing is three tiers, not five. Nobody could explain the middle two."},
-             {name:"Dev",text:"Copy is done. Waiting on Sam for the testimonial before it can go live."} ],
-    facts: ["Called for Sun 6:30pm.",
-            "Tied on 6 chips with 1 other time, and took the one fewest people had a conflict with.",
-            "Settled 41 minutes after the first chip.",
-            "3 staked in: 2 turned up, Sam did not."],
-    summary: "Pricing drops from five tiers to three, because nobody could explain the middle two. The copy is finished and now waits on Sam's testimonial before it can ship.",
-    summarised: true
-  },
-  {
-    at: Date.now() - 6*DAYMS, label: "Tue 6:30pm",
-    chipsFor: 11, runnerUp: 4, settledIn: 9,
-    people: [ {name:"Mara",chips:4,attendance:"showed"}, {name:"Dev",chips:3,attendance:"showed"},
-              {name:"Iz",chips:3,attendance:"showed"}, {name:"Sam",chips:1,attendance:"noshow"} ],
-    notes: [ {name:"Mara",text:"Agreed we ship the beta on the 12th, not the 5th. Two weeks was never real."},
-             {name:"Dev",text:"I'll do the migration script. Iz reviews it before it touches anything live."},
-             {name:"Iz",text:"Sam to confirm the venue by Thursday or we move it back to the office."} ],
-    facts: ["Called for Tue 6:30pm.",
-            "Won on 11 chips against 4, and closed early because nothing left in hand could catch it.",
-            "Settled 9 minutes after the first chip.",
-            "4 staked in: 3 turned up, Sam did not."],
-    summary: "The beta ships on the 12th rather than the 5th, since two weeks was never realistic. Dev is writing the migration script and Iz reviews it before it touches anything live. Sam needs to confirm the venue by Thursday, otherwise it moves back to the office.",
-    summarised: true
-  }
-];
-
-var LKEY = "wya:", lroom = null;
-function lload(c){ try { var raw = localStorage.getItem(LKEY+c); if (raw) return JSON.parse(raw); } catch(e){} return null; }
-function lsave(){ try { localStorage.setItem(LKEY+lroom.code, JSON.stringify(lroom)); } catch(e){} }
-function lblank(c,slots){ return { code:c, slots:slots, players:{}, avail:{}, stakes:{}, locked:false, winner:null, attendance:{}, notes:[], history:[], firstChipAt:null }; }
-
-function seedBots(){
-  // A demo table, so opening the link alone still shows the whole mechanic.
-  // Sam deliberately keeps one chip in hand: that single chip is what holds
-  // the board open until it can't be held open any more.
-  var plan = [[1,[[1,1]]],[3,[[0,1]]],[4,[[3,2]]],[5,[[0,2],[1,2]]],[7,[[1,3],[2,2]]],[9,[[0,2],[2,2]]],[11,[[3,2]]]];
-  var conflicts = [[0,[0]],[2,[1,2]],[6,[3]],[8,[0,1]],[10,[2]]];
-  BOTS.forEach(function(n,i){ lroom.players["b"+i] = { name:n, chips:CHIPS, synced:true }; lroom.avail["b"+i] = {}; });
-  conflicts.forEach(function(c){
-    var slot = lroom.slots[c[0]]; if (!slot) return;
-    c[1].forEach(function(bi){ lroom.avail["b"+bi][slot.id] = (bi % 2) ? "maybe" : "busy"; });
-  });
-  plan.forEach(function(p){
-    var slot = lroom.slots[p[0]]; if (!slot) return;
-    lroom.stakes[slot.id] = lroom.stakes[slot.id] || {};
-    p[1].forEach(function(pair){ lroom.stakes[slot.id]["b"+pair[0]] = pair[1]; });
-  });
-
-  /* The book is not empty. Without this the notetaker and the whole record -
-     the two things that make this a loop rather than a poll - stay invisible
-     until somebody plays a full round, which on a demo nobody does. */
-  lroom.history = SAMPLE_MEETINGS.slice();
-}
-
-// The notetaker, solo-table edition: the same factual record composed from what
-// the room actually holds. The AI summary is the worker's half, so here it is
-// honestly absent rather than faked.
-function localRecord(){
-  var slot = null;
-  lroom.slots.forEach(function(x){ if (x.id === lroom.winner) slot = x; });
-  var stakes = lroom.stakes[lroom.winner] || {};
-  var people = Object.keys(stakes).map(function(pid){
-    return { name: lroom.players[pid] ? lroom.players[pid].name : "someone who left",
-             chips: stakes[pid], attendance: lroom.attendance[pid] || "unknown" };
-  }).sort(function(a,b){ return b.chips - a.chips; });
-  var showed = people.filter(function(p){ return p.attendance === "showed"; });
-  var missed = people.filter(function(p){ return p.attendance === "noshow"; });
-  var t = totalsOf(lroom).sort(function(a,b){ return b.n-a.n; });
-  var mins = (lroom.firstChipAt && lroom.lockedAt) ? Math.max(1, Math.round((lroom.lockedAt - lroom.firstChipAt)/60000)) : null;
-  var lines = [];
-  lines.push(slot ? "Called for " + slot.label + "." : "A time was called.");
-  if (t.length > 1) lines.push("Won on " + t[0].n + " chips against " + t[1].n + ", and closed early because nothing left in hand could catch it.");
-  lines.push(people.length + " staked in" + (showed.length || missed.length
-    ? ": " + showed.length + " turned up" + (missed.length ? ", " + missed.map(function(p){ return p.name; }).join(" and ") + " did not" : "")
-    : ", attendance never marked") + ".");
-  return { at: Date.now(), label: slot ? slot.label : "unknown", chipsFor: t.length ? t[0].n : 0,
-    runnerUp: t.length > 1 ? t[1].n : 0, settledIn: mins, people: people,
-    notes: (lroom.notes||[]).map(function(n){ return { name:n.name, text:n.text, at:n.at }; }),
-    facts: lines, summary: null, summarised: false };
-}
-
-/* ---------- net ---------- */
-function post(path, body){
-  return fetch(API + path, { method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify(body) })
-    .then(function(res){
-      return res.json().then(function(j){
-        if (!res.ok) throw new Error(j.error || "That didn't go through.");
-        return j;
-      });
-    });
-}
-function join(name){
-  var slots = makeSlots(preset);
-  if (local){
-    lroom = lload(code) || lblank(code, slots);
-    if (!lroom.slots.length) lroom.slots = slots;
-    if (demo && !Object.keys(lroom.players).length) seedBots();
-    playerId = "you";
-    lroom.players[playerId] = { name:name, chips:CHIPS, synced:false };
-    lroom.avail[playerId] = lroom.avail[playerId] || {};
-    lsave();
-    return Promise.resolve({ playerId:playerId, state:viewOf(lroom) });
-  }
-  return post("/room/" + code + "/join", { name:name, slots:slots });
-}
-function pull(){
-  if (local) return Promise.resolve(viewOf(lroom));
-  return fetch(API + "/room/" + code).then(function(r){ return r.json(); });
-}
-function act(what, extra){
-  if (local){
-    if (what === "avail"){
-      lroom.avail[playerId] = extra.avail || {};
-      lroom.players[playerId].synced = true;
-    } else if (what === "chip"){
-      if (lroom.locked || spentBy(lroom,playerId) >= CHIPS) return Promise.resolve(viewOf(lroom));
-      if ((lroom.avail[playerId]||{})[extra.slotId] === "busy") return Promise.reject(new Error("You marked that one busy."));
-      lroom.stakes[extra.slotId] = lroom.stakes[extra.slotId] || {};
-      lroom.stakes[extra.slotId][playerId] = (lroom.stakes[extra.slotId][playerId]||0) + 1;
-      if (!lroom.firstChipAt) lroom.firstChipAt = Date.now();
-      settle(lroom);
-    } else if (what === "propose"){
-      if (lroom.locked) return Promise.reject(new Error("The board already closed."));
-      if (lroom.slots.length >= 24) return Promise.reject(new Error("The table is full."));
-      if (lroom.slots.some(function(x){ return Math.abs(x.startsAt - extra.startsAt) < 60000; }))
-        return Promise.reject(new Error("That time is already on the table."));
-      lroom.slots.push({ id:"u"+Math.random().toString(36).slice(2,8), label:extra.label,
-        startsAt:extra.startsAt, endsAt:extra.startsAt+90*60000,
-        by:playerId, byName:lroom.players[playerId].name });
-      lroom.slots.sort(function(x,y){ return x.startsAt - y.startsAt; });
-    } else if (what === "unchip"){
-      if (!lroom.locked){ for (var s in lroom.stakes) delete lroom.stakes[s][playerId]; }
-    } else if (what === "attend"){
-      lroom.attendance[playerId] = extra.showed ? "showed" : "noshow";
-      var st = lroom.stakes[lroom.winner] ? (lroom.stakes[lroom.winner][playerId]||0) : 0;
-      lroom.players[playerId].chips = extra.showed ? CHIPS : Math.max(0, CHIPS - st);
-    } else if (what === "note"){
-      lroom.notes = lroom.notes || [];
-      lroom.notes.push({ playerId:playerId, name:lroom.players[playerId].name, text:extra.text, at:Date.now() });
-    } else if (what === "next"){
-      lroom.history = lroom.history || [];
-      lroom.history.push(localRecord());
-      lroom.slots = extra.slots || lroom.slots;
-      lroom.stakes = {}; lroom.locked = false; lroom.winner = null;
-      lroom.attendance = {}; lroom.notes = []; lroom.firstChipAt = null;
-      for (var pz in lroom.avail) lroom.avail[pz] = {};
-      for (var py in lroom.players) lroom.players[py].synced = false;
-      myMarks = {};
-    }
-    lsave();
-    return Promise.resolve(viewOf(lroom));
-  }
-  var body = { playerId: playerId }, k;
-  for (k in extra) body[k] = extra[k];
-  return post("/room/" + code + "/" + what, body);
-}
-
-/* ---------- Google Calendar, demonstration ----------
-   This does NOT contact Google and does not ask for an account. A live build
-   would use Google Identity Services browser-side with the calendar.freebusy
-   scope - the narrowest one that answers the question, returning busy intervals
-   and never titles, guests or locations - and that needs an OAuth client
-   registered to this domain.
-
-   Nobody should hand a real calendar to a demo site to see a board work, so the
-   button is labelled a demo everywhere it appears and simply deals a plausible
-   working week. The .ics link and .ics file paths below are the real ones and
-   read your actual calendar. */
-var gConnected = false;
-
-function gSay(msg, kind){
-  var g = el("gStatus");
-  g.className = "status" + (kind ? " " + kind : "");
-  g.style.marginTop = msg ? "9px" : "0";
-  g.innerHTML = msg;
-}
-
-/* A believable week: a couple of evenings gone entirely, one soft maybe, the
-   rest clear. Deterministic per board so it does not shuffle under you. */
-function demoBusy(){
-  var out = {}, i = 0;
-  state.slots.forEach(function(s, idx){
-    var d = new Date(s.startsAt), day = d.getDay(), hour = d.getHours();
-    if (day === 2 && hour >= 18) out[s.id] = "busy";
-    else if (day === 4 && hour >= 20) out[s.id] = "busy";
-    else if (day === 0) out[s.id] = "maybe";
-    else if (idx === 3) out[s.id] = "busy";
-    if (out[s.id]) i++;
-  });
-  return out;
-}
-
-function gConnect(){
-  var btn = el("gsign");
-  btn.disabled = true;
-  gSay("Connecting...");
-  setTimeout(function(){
-    var found = demoBusy(), n = 0, k;
-    for (k in found){ myMarks[k] = found[k]; n++; }
-    renderMarkGrid();
-    gConnected = true;
-    btn.disabled = false;
-    el("gsignLabel").textContent = "Re-run the demo sync";
-    el("gout").classList.remove("hide");
-    var busyN = 0, maybeN = 0;
-    for (k in found){ if (found[k] === "busy") busyN++; else maybeN++; }
-    gSay("<b>Demo calendar read.</b> Marked <b>" + busyN + "</b> booked" +
-         (maybeN ? " and <b>" + maybeN + "</b> maybe" : "") +
-         " across these times. Nothing was sent anywhere and no account was touched. " +
-         "Adjust anything below, then take the table.", "good");
-  }, 620);
-}
-
-/* ---------- calendar ---------- */
-function windowOfBoard(){
-  var a = Infinity, b = -Infinity;
-  state.slots.forEach(function(s){ a = Math.min(a, s.startsAt); b = Math.max(b, s.endsAt); });
-  return [a - 86400000, b + 86400000];
-}
-function ingestIcs(text){
-  var w = windowOfBoard();
-  var windows = window.ICS.parse(text, w[0], w[1]);
-  var found = window.ICS.applyTo(state.slots, windows);
-  myMarks = found;
-  var busyN = 0, maybeN = 0, k;
-  for (k in found){ if (found[k] === "busy") busyN++; else maybeN++; }
-  renderMarkGrid();
-  var s = el("syncStatus");
-  s.className = "status good";
-  s.innerHTML = "Read <b>" + windows.length + "</b> event" + (windows.length===1?"":"s") +
-    ". Marked <b>" + busyN + "</b> booked" + (maybeN ? " and <b>"+maybeN+"</b> maybe" : "") +
-    ". Adjust anything below, then take the table.";
-}
-
-/* ---------- render ---------- */
-function colorFor(pid){
-  if (pid === playerId) return COLORS[0];
-  var ids = Object.keys(state.players).filter(function(x){ return x !== playerId; }).sort();
-  return COLORS[1 + (ids.indexOf(pid) % (COLORS.length - 1))];
-}
-function chipEl(color, small){
-  var c = document.createElement("span");
-  c.className = "chip" + (small ? " sm" : "");
-  c.style.background = color;
-  if (color !== COLORS[0]) c.style.borderColor = "rgba(0,0,0,.34)";
-  return c;
-}
-function myChips(){ return state.players[playerId] ? state.players[playerId].chips : CHIPS; }
-function myLeft(){
-  var n = 0, s;
-  for (s in state.stakes) n += state.stakes[s][playerId] || 0;
-  return Math.max(0, myChips() - n);
-}
-
-function renderMarkGrid(){
-  var grid = el("markGrid"); grid.textContent = "";
-  state.slots.forEach(function(s){
-    var v = myMarks[s.id] || "free";
-    var b = document.createElement("button");
-    b.type = "button";
-    b.className = "slot mk-" + v;
-    b.setAttribute("aria-label", s.label + ", " +
-      (v === "free" ? "not marked" : v === "maybe" ? "only at a push" : "can't make it") +
-      ". Tap to change");
-    var when = document.createElement("span"); when.className = "when";
-    var a = document.createElement("span"); a.textContent = s.label;
-    when.appendChild(a);
-    var mk = document.createElement("span"); mk.className = "mark";
-    mk.textContent = v === "free" ? "tap if you can't" : (v === "maybe" ? "only at a push" : "can't make it");
-    b.appendChild(when); b.appendChild(mk);
-    b.addEventListener("click", function(){
-      var next = CYCLE[myMarks[s.id] || "free"];
-      if (next === "free") delete myMarks[s.id]; else myMarks[s.id] = next;
-      renderMarkGrid();
-      var n = Object.keys(myMarks).length;
-      el("markStatus").className = "status";
-      el("markStatus").style.marginTop = n ? "9px" : "0";
-      el("markStatus").textContent = n
-        ? n + " of " + state.slots.length + " ruled out. The rest are still open for you."
-        : "";
-    });
-    grid.appendChild(b);
-  });
-}
-
-function renderTable(){
-  el("tCode").textContent = code;
-  el("demoTag").textContent = demo ? "· demo table" : "";
-  el("offline").classList.toggle("hide", !local || demo);
-
-  var left = myLeft(), av = state.availability || {};
-  var bank = el("bank"); bank.textContent = "";
-  for (var i = 0; i < myChips(); i++){
-    var c = chipEl(COLORS[0], false);
-    if (i >= left) c.className += " spent";
-    bank.appendChild(c);
-  }
-  el("bankCount").textContent = left + " left";
-
-  var byId = {};
-  state.totals.forEach(function(t){ byId[t.id] = t.n; });
-  var myAv = (state.avail && state.avail[playerId]) || {};
-
-  var grid = el("grid"); grid.textContent = "";
-  state.slots.forEach(function(s){
-    var a = av[s.id] || { state:"clean", busy:0, maybe:0 };
-    var iAmBusy = myAv[s.id] === "busy";
-    var b = document.createElement("button");
-    b.type = "button";
-    b.className = "slot " + a.state + (state.leader === s.id ? " lead" : "") + (iAmBusy ? " mine-busy" : "");
-    b.disabled = state.locked || left === 0 || busy || iAmBusy;
-    var n = byId[s.id] || 0;
-    b.setAttribute("aria-label", s.label + ", " + n + " chip" + (n===1?"":"s") + ", " +
-      (a.state === "clean" ? "clear for everyone" : a.state === "maybe" ? a.maybe + " maybe" : a.busy + " booked") +
-      (b.disabled ? "" : ". Drop a chip"));
-
-    var when = document.createElement("span"); when.className = "when";
-    var t1 = document.createElement("span"); t1.textContent = s.label;
-    var t2 = document.createElement("span"); t2.className = "n"; t2.textContent = n || "";
-    when.appendChild(t1); when.appendChild(t2);
-
-    var tag = document.createElement("span"); tag.className = "tag";
-    tag.textContent = iAmBusy ? "you're booked"
-      : a.state === "clean" ? "clear"
-      : a.state === "maybe" ? a.maybe + " maybe"
-      : a.busy + " booked";
-
-    var pile = document.createElement("span"); pile.className = "pile";
-    var m = state.stakes[s.id] || {};
-    Object.keys(m).sort().forEach(function(pid){
-      for (var k = 0; k < m[pid]; k++) pile.appendChild(chipEl(colorFor(pid), true));
-    });
-
-    b.appendChild(when); b.appendChild(tag);
-    if (s.byName){
-      var by = document.createElement("span"); by.className = "by";
-      by.textContent = (s.by === playerId ? "you asked for this" : s.byName + " asked for this");
-      b.appendChild(by);
-    }
-    b.appendChild(pile);
-    b.addEventListener("click", function(){ drop(s.id); });
-    grid.appendChild(b);
-  });
-
-  // the suggestion: what the sync step bought you
-  var sug = el("suggest");
-  var cleanCount = (state.clean || []).length;
-  var syncedN = state.synced || 0, total = state.playerCount || Object.keys(state.players).length;
-  if (!syncedN){
-    sug.innerHTML = "<b>Nobody has synced a calendar.</b> The board will still work, it just can't tell you which of these times is genuinely clear.";
-  } else if (cleanCount){
-    var names = (state.clean || []).slice(0,3).map(function(id){
-      var f = null; state.slots.forEach(function(s){ if (s.id === id) f = s; }); return f ? f.label : id;
-    }).join(", ");
-    sug.innerHTML = "<b>" + cleanCount + " time" + (cleanCount===1?"":"s") + " clear for all " + total +
-      "</b> — " + names + (cleanCount > 3 ? " and more" : "") + ". " + syncedN + " of " + total + " synced.";
-  } else {
-    sug.innerHTML = "<b>No time is clear for everyone.</b> Stake on the least-blocked one and somebody moves something. " + syncedN + " of " + total + " synced.";
-  }
-
-  var crew = el("crew"); crew.textContent = "";
-  Object.keys(state.players).forEach(function(pid){
-    var avn = document.createElement("span");
-    avn.className = "av" + (state.players[pid].synced ? "" : " unsynced");
-    avn.style.background = colorFor(pid);
-    avn.textContent = (state.players[pid].name || "?").charAt(0).toUpperCase();
-    avn.title = state.players[pid].name + (state.players[pid].synced ? " · synced" : " · no calendar");
-    crew.appendChild(avn);
-  });
-  var lbl = document.createElement("span");
-  lbl.className = "lbl";
-  var np = Object.keys(state.players).length;
-  lbl.textContent = np + (np === 1 ? " person" : " people") + " · " + state.unspent + " chips still in hands";
-  crew.appendChild(lbl);
-
-  var st = el("tStatus"); st.className = "status";
-  if (!state.leader) st.innerHTML = "Nothing staked yet. <b>Most chips wins</b> &mdash; drop one on a time you'll actually turn up for.";
-  else if (left === 0) st.innerHTML = "Your hand is empty. Leading time is up <b>" + state.gap +
-    "</b> with <b>" + state.unspent + "</b> still in other hands, so it can still move.";
-  else st.innerHTML = "<b>Most chips wins.</b> The leader is up <b>" + state.gap + "</b> and there are <b>" +
-    state.unspent + "</b> chips left in hands &mdash; it locks itself the moment the lead is more than those.";
-  el("takeBack").disabled = state.locked || left === myChips() || busy;
-}
-
-function renderCalled(){
-  var w = null;
-  state.slots.forEach(function(s){ if (s.id === state.winner) w = s; });
-  el("calledTime").textContent = w ? w.label : "—";
-  var t = state.totals.slice().sort(function(a,b){ return b.n-a.n; });
-  el("calledWhy").textContent = state.decidedBy === "tie"
-    ? "Every chip was spent and " + (state.tiedWith || 2) + " times were level on " + t[0].n +
-      ". Broken on the one fewest of you had a conflict with, and the earlier of those. Nothing was left to play."
-    : "Most chips wins, and this one can no longer be caught - " + t[0].n +
-      " against " + (t[1] ? t[1].n : 0) + ", with only " + state.unspent +
-      " still in anyone's hand. So it stopped asking.";
-
-  var m = state.stakes[state.winner] || {};
-  var roster = el("roster"); roster.textContent = "";
-  Object.keys(m).sort(function(a,b){ return m[b]-m[a]; }).forEach(function(pid){
-    var q = m[pid]; if (!q) return;
-    var att = state.attendance[pid];
-    var row = document.createElement("div");
-    row.className = "prow" + (att === "noshow" ? " burn" : "");
-    var who = document.createElement("span"); who.className = "who";
-    who.appendChild(chipEl(colorFor(pid), false));
-    var nm = document.createElement("span"); nm.className = "nm";
-    nm.textContent = state.players[pid] ? state.players[pid].name : "gone";
-    who.appendChild(nm);
-    var stake = document.createElement("span"); stake.className = "stake";
-    for (var k = 0; k < q; k++) stake.appendChild(chipEl(colorFor(pid), true));
-    var v = document.createElement("span");
-    if (att === "showed"){ v.className = "verdict v-kept"; v.textContent = "chips back"; }
-    else if (att === "noshow"){ v.className = "verdict v-burn"; v.textContent = "no-show"; }
-    else { v.className = "verdict v-in"; v.textContent = q + (q===1?" chip in":" chips in"); }
-    row.appendChild(who); row.appendChild(stake); row.appendChild(v);
-    roster.appendChild(row);
-  });
-
-  var done = !!state.attendance[playerId];
-  el("showed").disabled = done; el("noshow").disabled = done;
-  if (done){
-    el("cStatus").className = "status";
-    el("cStatus").innerHTML = state.attendance[playerId] === "showed"
-      ? "Your chips are back. <b>" + myChips() + "</b> in hand next time someone asks."
-      : "Chips burned. You're down to <b>" + myChips() + "</b> next time someone asks when you available.";
-  }
-}
-
-function ago(ms){
-  var d = Math.max(0, Date.now() - ms), m = Math.round(d/60000);
-  if (m < 1) return "just now";
-  if (m < 60) return m + "m ago";
-  var h = Math.round(m/60);
-  if (h < 24) return h + "h ago";
-  return Math.round(h/24) + "d ago";
-}
-
-function renderNotes(){
-  var list = el("noteList"); list.textContent = "";
-  var notes = state.notes || [];
-  if (!notes.length){
-    var li = document.createElement("li");
-    li.className = "note";
-    li.innerHTML = '<span class="nt" style="color:var(--sage-dim)">Nothing noted yet. Whatever lands here is what the notetaker writes the record from.</span>';
-    list.appendChild(li);
-    return;
-  }
-  notes.forEach(function(n){
-    var li = document.createElement("li"); li.className = "note";
-    var a = document.createElement("span"); a.className = "nb"; a.textContent = n.name;
-    var b = document.createElement("span"); b.className = "nt"; b.textContent = n.text;
-    li.appendChild(a); li.appendChild(b); list.appendChild(li);
-  });
-}
-
-var histOpened = false;
-function renderHistory(list){
-  var h = list || (state && state.history) || [];
-  el("historyPanel").classList.toggle("hide", !h.length);
-  if (!h.length) return;
-  /* Open it once, unasked, the first time there is anything in it. */
-  if (!histOpened){
-    histOpened = true;
-    el("histBody").classList.remove("hide");
-    el("histToggle").textContent = "Hide";
-    el("histToggle").setAttribute("aria-expanded", "true");
-  }
-  el("histTitle").textContent = "Previous meetings (" + h.length + ")";
-  var body = el("histBody"); body.textContent = "";
-  h.slice().reverse().forEach(function(m){
-    var box = document.createElement("div"); box.className = "mtg";
-
-    var hd = document.createElement("div"); hd.className = "hd";
-    var ttl = document.createElement("span"); ttl.className = "ttl"; ttl.textContent = m.label;
-    var ago2 = document.createElement("span"); ago2.className = "ago"; ago2.textContent = ago(m.at);
-    hd.appendChild(ttl); hd.appendChild(ago2);
-
-    var facts = document.createElement("p"); facts.className = "facts";
-    facts.textContent = (m.facts || []).join(" ");
-
-    box.appendChild(hd); box.appendChild(facts);
-
-    if (m.people && m.people.length){
-      var att = document.createElement("div"); att.className = "att";
-      m.people.forEach(function(p){
-        var sp = document.createElement("span");
-        sp.className = p.attendance === "showed" ? "up" : (p.attendance === "noshow" ? "no" : "");
-        sp.textContent = p.name + " · " + p.chips + (p.attendance === "showed" ? " · showed" : p.attendance === "noshow" ? " · no-show" : "");
-        att.appendChild(sp);
-      });
-      box.appendChild(att);
-    }
-
-    if (m.summary){
-      var sum = document.createElement("p"); sum.className = "sum"; sum.textContent = m.summary;
-      box.appendChild(sum);
-    } else if (m.notes && m.notes.length){
-      var ns = document.createElement("p"); ns.className = "nosum";
-      ns.textContent = "No AI summary for this one — the record below is what was typed.";
-      box.appendChild(ns);
-    }
-
-    (m.notes || []).forEach(function(n){
-      var li = document.createElement("p"); li.className = "facts";
-      li.innerHTML = "";
-      var b = document.createElement("span"); b.style.color = "var(--sage-dim)"; b.style.fontFamily = "var(--mono)"; b.style.fontSize = "11px";
-      b.textContent = n.name + "  ";
-      var t2 = document.createElement("span"); t2.style.color = "var(--paper)"; t2.textContent = n.text;
-      li.appendChild(b); li.appendChild(t2);
-      box.appendChild(li);
-    });
-
-    body.appendChild(box);
-  });
-}
-
-var screen = "join";
-function show(which){
-  screen = which;
-  ["join","syncScreen","tableScreen","calledScreen"].forEach(function(x){
-    el(x).classList.toggle("hide", x !== which);
-  });
-}
-function paint(){
-  if (!state) return;
-  el("histSample").classList.toggle("hide", !!(state.history && state.history.length));
-  renderHistory();
-  if (state.locked){ show("calledScreen"); renderCalled(); renderNotes(); return; }
-  if (screen === "syncScreen"){ return; }
-  show("tableScreen"); renderTable();
-}
-
-/* ---------- actions ---------- */
-function drop(slotId){
-  if (busy || !state || state.locked || myLeft() === 0) return;
-  busy = true; renderTable();
-  act("chip", { slotId: slotId }).then(function(s){
-    state = s; busy = false; paint();
-  }).catch(function(e){
-    busy = false;
-    el("tStatus").className = "status err";
-    el("tStatus").textContent = e.message;
-  });
-}
-function poll(){
-  if (local || busy || screen === "syncScreen") return;
-  pull().then(function(s){ if (s && s.slots){ state = s; paint(); } }).catch(function(){});
-}
-function startPolling(){ if (!local){ clearInterval(timer); timer = setInterval(poll, 1400); } }
-
-/* ---------- boot ---------- */
-function newCode(){
-  var a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", s = "";
-  for (var i = 0; i < 6; i++) s += a.charAt(Math.floor(Math.random()*a.length));
-  return s;
-}
-code = (location.hash || "").replace(/^#/, "").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,12);
-var fresh = !code;
-if (!code){ code = newCode(); location.hash = code; }
-el("joinCode").textContent = code;
-/* Show the book straight away. A judge who never plays a round should still see
-   what the notetaker produces, so the sample renders on the landing page and is
-   replaced the moment a real room has a record of its own. */
-renderHistory(SAMPLE_MEETINGS);
-el("histSample").classList.remove("hide");
-el("joinRoomNote").textContent = fresh ? "· new table, this link is the invite" : "· joining an existing table";
-el("presetWrap").classList.toggle("hide", !fresh);
-
-document.querySelectorAll(".preset").forEach(function(b){
-  b.addEventListener("click", function(){
-    preset = b.dataset.preset;
-    document.querySelectorAll(".preset").forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); });
-  });
-});
-
-function seated(r){
-  playerId = r.playerId; state = r.state;
-  el("resume").classList.remove("hide");
-  myMarks = {};
-  var mine = (state.avail && state.avail[playerId]) || {};
-  for (var k in mine) myMarks[k] = mine[k];
-  show("syncScreen");
-  renderMarkGrid();
-  startPolling();
-}
-
-el("sit").addEventListener("click", function(){
-  var name = el("nameIn").value.trim();
-  if (!name){
-    el("joinStatus").className = "status err";
-    el("joinStatus").textContent = "Type a name so people know who staked what.";
-    el("nameIn").focus();
-    return;
-  }
-  el("sit").disabled = true;
-  el("joinStatus").className = "status";
-  el("joinStatus").textContent = "Sitting down...";
-  join(name).then(seated).catch(function(){
-    // Room service unreachable: fall back to a table in this browser, and say so.
-    local = true;
-    join(name).then(seated).catch(function(e){
-      el("sit").disabled = false;
-      el("joinStatus").className = "status err";
-      el("joinStatus").textContent = e.message || "Couldn't sit down.";
-    });
-  });
-});
-el("nameIn").addEventListener("keydown", function(e){ if (e.key === "Enter") el("sit").click(); });
-
-/* The wordmark is the way home from anywhere. If there is a live table the
-   landing page says so and offers the way back, rather than stranding you. */
-document.querySelectorAll("[data-home]").forEach(function(w){
-  w.addEventListener("click", function(){
-    show("join");
-    el("resume").classList.toggle("hide", !state);
-    window.scrollTo(0, 0);
-  });
-});
-el("backToTable").addEventListener("click", function(){
-  if (!state) return;
-  if (state.locked){ show("calledScreen"); renderCalled(); renderNotes(); }
-  else { show("tableScreen"); renderTable(); }
-  window.scrollTo(0, 0);
-});
-
-el("demo").addEventListener("click", function(){
-  local = true; demo = true;
-  code = "DEMO" + newCode().slice(0,2);
-  location.hash = code;
-  if (!el("nameIn").value.trim()) el("nameIn").value = "you";
-  el("sit").click();
-});
-
-/* sync screen */
-el("gsign").addEventListener("click", gConnect);
-el("gout").addEventListener("click", function(){
-  var found = demoBusy(), k;
-  for (k in found) delete myMarks[k];
-  gConnected = false;
-  renderMarkGrid();
-  el("gsignLabel").textContent = "Sign in with Google";
-  this.classList.add("hide");
-  gSay("Cleared what the demo marked. Anything you set by hand is untouched.");
-});
-el("pickFile").addEventListener("click", function(){ el("icsFile").click(); });
-el("icsFile").addEventListener("change", function(){
-  var f = this.files && this.files[0];
-  if (!f) return;
-  var fr = new FileReader();
-  fr.onload = function(){
-    try { ingestIcs(String(fr.result)); }
-    catch(e){ el("syncStatus").className = "status err"; el("syncStatus").textContent = "Couldn't read that file."; }
-  };
-  fr.onerror = function(){ el("syncStatus").className = "status err"; el("syncStatus").textContent = "Couldn't read that file."; };
-  fr.readAsText(f);
-});
-function finishSync(save){
-  var go = function(){ show("tableScreen"); renderTable(); };
-  if (!save){ go(); return; }
-  busy = true;
-  act("avail", { avail: myMarks }).then(function(s){ state = s; busy = false; go(); })
-    .catch(function(){ busy = false; go(); });
-}
-el("doneSync").addEventListener("click", function(){ finishSync(true); });
-el("skipSync").addEventListener("click", function(){ finishSync(false); });
-el("backToSync").addEventListener("click", function(){ show("syncScreen"); renderMarkGrid(); });
-
-el("propose").addEventListener("click", function(){
-  var raw = el("propAt").value;
-  var st = el("pStatus");
-  if (!raw){ st.className = "status err"; st.textContent = "Pick a date and a time first."; return; }
-  var when = new Date(raw);
-  if (isNaN(when.getTime())){ st.className = "status err"; st.textContent = "That date didn't read."; return; }
-  if (when.getTime() < Date.now() - 60000){ st.className = "status err"; st.textContent = "That one's already been and gone."; return; }
-  var btn = this; btn.disabled = true;
-  st.className = "status"; st.textContent = "Putting it on the table...";
-  busy = true;
-  act("propose", { startsAt: when.getTime(), label: labelFor(when) }).then(function(x){
-    state = x; busy = false; btn.disabled = false;
-    el("propAt").value = "";
-    st.className = "status good";
-    st.textContent = labelFor(when) + " is on the table, with your name on it.";
-    paint();
-  }).catch(function(e){
-    busy = false; btn.disabled = false;
-    st.className = "status err";
-    st.textContent = e.message || "Couldn't add that.";
-  });
-});
-
-el("takeBack").addEventListener("click", function(){
-  busy = true;
-  act("unchip", {}).then(function(s){ state = s; busy = false; paint(); }).catch(function(){ busy = false; });
-});
-
-function copy(text, node, done){
-  var was = node.textContent;
-  var ok = function(){ node.textContent = done; setTimeout(function(){ node.textContent = was; }, 1600); };
-  if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(ok, function(){ window.prompt("Copy this", text); });
-  } else window.prompt("Copy this", text);
-}
-el("copy").addEventListener("click", function(){
-  copy(location.origin + location.pathname + "#" + code, this, "Copied");
-});
-el("copySum").addEventListener("click", function(){
-  var w = null;
-  state.slots.forEach(function(s){ if (s.id === state.winner) w = s; });
-  var m = state.stakes[state.winner] || {}, lines = [];
-  Object.keys(m).sort(function(a,b){ return m[b]-m[a]; }).forEach(function(pid){
-    lines.push("  " + (state.players[pid] ? state.players[pid].name : "?") + " - " + m[pid] + " chips");
-  });
-  copy("It's " + (w ? w.label : "?") + ".\nStaked:\n" + lines.join("\n") +
-       "\n\nvia " + location.origin + location.pathname + "#" + code, this, "Copied");
-});
-
-el("histToggle").addEventListener("click", function(){
-  var open = el("histBody").classList.toggle("hide");
-  this.setAttribute("aria-expanded", String(!open));
-  this.textContent = open ? "Show" : "Hide";
-});
-
-el("addNote").addEventListener("click", function(){
-  var text = el("noteIn").value.trim();
-  if (!text){
-    el("nStatus").className = "status err";
-    el("nStatus").textContent = "Type something first.";
-    return;
-  }
-  busy = true;
-  act("note", { text: text }).then(function(s){
-    state = s; busy = false;
-    el("noteIn").value = "";
-    el("nStatus").className = "status";
-    el("nStatus").textContent = "Noted.";
-    renderNotes();
-  }).catch(function(e){
-    busy = false;
-    el("nStatus").className = "status err";
-    el("nStatus").textContent = e.message || "That didn't save.";
-  });
-});
-
-el("wrapUp").addEventListener("click", function(){
-  busy = true;
-  el("nStatus").className = "status";
-  el("nStatus").textContent = "Writing the record...";
-  act("next", { slots: makeSlots(preset) }).then(function(s){
-    state = s; busy = false;
-    myMarks = {};
-    el("nStatus").textContent = "";
-    show("syncScreen");
-    renderMarkGrid();
-    renderHistory();
-  }).catch(function(e){
-    busy = false;
-    el("nStatus").className = "status err";
-    el("nStatus").textContent = e.message || "Couldn't wrap that up.";
-  });
-});
-
-["showed","noshow"].forEach(function(kind){
-  el(kind).addEventListener("click", function(){
-    busy = true;
-    act("attend", { showed: kind === "showed" }).then(function(s){ state = s; busy = false; paint(); })
-      .catch(function(){ busy = false; });
-  });
-});
-
-})();
-</script>
-
-</body></html>
+      <section class="record-grid">
+        <div class="notes-card">
+          <div class="section-head">
+            <div><span class="eyebrow">MEETING RECORD</span><h3>Keep the decision, not another chat log.</h3></div>
+            <button id="nextRoundBtn" class="secondary hidden" type="button">WRAP + NEXT ROUND</button>
+          </div>
+          <div id="notesList" class="notes-list"></div>
+          <div class="note-compose">
+            <textarea id="notesInput" maxlength="800" rows="2" placeholder="Decision, owner, next step…"></textarea>
+            <button id="addNoteBtn" type="button">ADD NOTE</button>
+          </div>
+        </div>
+        <div class="history-card">
+          <div class="section-head"><div><span class="eyebrow">ROOM MEMORY</span><h3>Previous locks</h3></div></div>
+          <div id="historyList" class="history-list"></div>
+        </div>
+      </section>
+
+      <footer class="footer"><span>BACKED / P2P COMMITMENT BOARD</span><span>WebRTC data channels · local calendar parsing · deterministic lock rule</span></footer>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js" integrity="sha512-XEKeWX+mI3Ov+tg2evDlVQFzVOIp4T8J3cNcCEPaEUGpxJV3eZaN8rHuvnFPvQpGJBHPmrozJDMpm2xcDvtmyQ==" crossorigin="anonymous"></script>
+  <script src="src/ics.js"></script>
+  <script type="module" src="src/app.mjs"></script>
 </body>
 </html>

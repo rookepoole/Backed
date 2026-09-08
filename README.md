@@ -1,90 +1,141 @@
-# when you available
+# BACKED
 
-A group meeting coordinator that closes the loop — built for
-[Cortex Research Group](https://campai.cortexresearch.group), Season 2 Episode 5.
+**Commitment-first group scheduling over WebRTC.**
 
-**Live:** https://aunysillyme.github.io/wya/
+> Don't vote for when you're free. Back the time you'll actually protect.
 
-## The thesis
+BACKED is a clean-room product/visual remix of the supplied scheduling repo for Cortex Research Group Season 2, Episode 5. It keeps the strongest underlying mechanic — scarce commitment and an automatic mathematical close — but replaces the casino/felt framing, the Cloudflare Durable Object backend, the hosted-worker dependency, and the single-page explainer flow.
 
-The availability grid is what causes the no-show. A green box costs nothing, so
-saying yes costs nothing, so nobody turns up. Reminders cannot repair a
-commitment that was never made.
+## The pain point
 
-Every tool in this space collects availability and stops: When2Meet finds the
-overlap and hands confirming and reminding back to the organiser, and Doodle,
-Rallly and the When2Meet clones do the same. Meanwhile no-shows run 20-30% at
-corporate campuses and ~32% across events, and the research is consistent that
-the weakest formats are the ones where not attending costs nothing.
+Availability tools answer **when could people meet?** They do not answer **which time will people actually defend and show up for?** A green checkbox is cheap, so five weak “yes” votes can look stronger than one person saying “I will protect this time.”
 
-So this does not add reminders. It makes the yes expensive enough not to need
-them.
+BACKED gives each participant **five units of backing**. You can stack all five on one time or spread them across several. The room locks the moment the leading time becomes mathematically uncatchable by all unspent backing combined.
 
-## How it works
+## What changed in the remix
 
-1. **Get in.** The room code mints itself into the url, so the address bar is
-   the invite. Name only, no account. First person through the door sets the
-   times from three one-tap presets.
-2. **Say what you can't make.** A demo Google sync, an exported `.ics` file
-   (parsed in your browser, never uploaded), or just tap the times. All
-   optional, and the whole step has a Skip button. You only ever flag conflicts:
-   leaving a time open is deliberately not a promise to be there.
-3. **The board suggests.** A time is only clean if it is clean for everyone, so
-   one person's conflict is the table's conflict. Anyone at the table can also
-   propose a specific date and time, and the slot carries the name of whoever
-   asked for it.
-4. **Stake five chips** on the times you will actually turn up for, stacked if
-   you mean it. You cannot chip everything, and you cannot stake a slot you
-   marked busy. The board closes itself the moment no chip left in anyone's hand
-   can catch the leader.
-5. **Show up, or don't.** Turn up and your stake comes back. Don't, and it
-   burns, and you are short next time someone asks when you available.
+- **New product identity:** BACKED; editorial commitment board instead of casino/felt table.
+- **New room primitive:** every room has a concrete *purpose* so the schedule is attached to an outcome, not just a date grid.
+- **WebRTC multiplayer:** no Cloudflare Worker or application database. The host browser is authoritative and guests send actions over WebRTC data channels.
+- **Host-authoritative state:** guests request actions; the host validates the rule and rebroadcasts the canonical room snapshot. That prevents peer divergence.
+- **No hard-wired competitor infrastructure:** there are no `workers.dev`, Durable Object, or competitor deployment URLs in the app.
+- **Local calendar privacy:** `.ics` files are parsed in the browser; only `busy` / `maybe` marks for candidate slots are shared.
+- **Persistent guest identity:** a random local guest ID survives reloads without sign-in.
+- **Decision record:** attendance, notes, and prior locks live in the room state.
+- **Judge-ready demo:** one click loads a seeded room with participants, conflicts, backing, and history.
+- **Pure/testable decision core:** room math is separated into `src/core.mjs` and covered with Node tests.
 
-Then the AI notetaker writes the meeting into the room's record and deals a
-fresh board, with chips carrying across. The room is the team; meetings are
-rounds inside it.
+## WebRTC architecture
 
-## The record
+```
+                       PeerJS Cloud
+                    signaling / handshake
+                           only
+                            │
+           ┌────────────────┴────────────────┐
+           │                                 │
+      Host browser  ◄════ WebRTC ════► Guest browser
+   canonical room state       data       action requests
+           │                                 │
+           ├════ WebRTC ════► Guest browser  │
+           └════ WebRTC ════► Guest browser  │
 
-Every fact in a meeting's record is composed from state the room holds — the
-time called, what it won on, minutes from first chip to close, who staked what,
-who showed. The model is handed only the notes people typed, and asked for two
-or three sentences that name decisions and owners.
+Calendar .ics ──► parsed locally ──► busy/maybe slot marks only
+```
 
-If that call fails, or returns a shape we did not expect, the record says there
-is no summary rather than inventing one. An honest gap beats a confident fake.
+The host browser owns the canonical state. A guest never directly mutates its local copy: it sends an action (`back`, `mark`, `note`, etc.), the host validates it with the same pure core used by tests, then the host broadcasts the resulting state.
 
-## Running it
+PeerJS is loaded from jsDelivr and uses PeerJS Cloud for signaling. The actual DataConnection payloads are WebRTC peer-to-peer. For production at meaningful scale, self-host PeerServer and add TURN rather than relying on the public signaling service.
 
-`index.html` is one self-contained file. Open it, or serve the directory. No
-build step, no bundler, no dependency — Google Fonts and (only if you use it)
-Google Identity Services are the external requests.
+## Decision rule
 
-Multiplayer needs the room worker (`worker/`), a Durable Object addressed by
-name. Without it the app falls back to a table in this browser and says so on
-the board rather than pretending. `worker/test-loop.mjs` drives the whole loop
-against the deployed worker: 31 assertions, entry through the record and the
-next round.
+For each candidate time:
 
-## What the worker does, and does not
+- `backed(time)` = total backing currently placed on that time
+- `gap` = leader backing − runner-up backing
+- `unspent` = every participant's remaining backing added together
 
-The worker holds the room and nothing else: join, availability, chips, the close
-rule, attendance, notes, the record. Every rule that decides anything lives
-there, never in the client.
+The board locks when:
 
-It has **no calendar endpoint**. An earlier version had `POST /ics`, which
-fetched a URL the caller supplied so a paste-a-link flow could get past CORS.
-That is an open fetch proxy on a public endpoint, nothing needed it, and it was
-removed. Calendar files are parsed in the browser instead, which is both safer
-and simpler: no server is in that path at all.
+```
+gap > unspent
+```
 
-## Limits, stated not hidden
+At that point no possible arrangement of every remaining unit can catch the leader, so waiting for more input cannot change the answer.
 
-- Timezones read as local; only the trailing-`Z` UTC form converts exactly.
-- Recurrence handles `DAILY`/`WEEKLY` with `INTERVAL`, `BYDAY`, `COUNT`,
-  `UNTIL`. Monthly and yearly are treated as one-off.
-- All-day events soften a slot to *maybe*, never *busy*. A judgment call that
-  can be wrong.
-- Availability is self-reported after sync. The chips are what make honesty
-  cost something.
-- No verified identity. Names are typed, not proven.
+If every unit is spent and the top score is tied, BACKED chooses:
+
+1. fewer hard conflicts,
+2. then fewer `maybe` marks,
+3. then the earlier time.
+
+## Calendar behavior
+
+`.ics` files are parsed locally. Supported behavior inherited/adapted from the supplied repo includes:
+
+- RFC 5545 folded lines
+- `DAILY` / `WEEKLY` RRULE expansion with `INTERVAL`, `BYDAY`, `COUNT`, and `UNTIL`
+- cancelled and transparent events ignored
+- all-day events become `maybe`, not hard `busy`
+- UTC `Z` timestamps handled exactly; floating/TZID values are interpreted in the viewer's local timezone
+
+No event title, attendee, description, or raw calendar file is sent to peers.
+
+## Run it
+
+The app is static. Serve the directory over HTTP(S):
+
+```bash
+npm run serve
+```
+
+Then open:
+
+```text
+http://localhost:8080
+```
+
+For real remote WebRTC rooms, deploy the directory to an **HTTPS static host** so guests can open the invite URL from other devices/networks.
+
+## Test it
+
+```bash
+npm test
+```
+
+Current suite covers:
+
+- conflicts blocking backing
+- five-unit scarcity
+- automatic inevitable close
+- full-spend tie resolution
+- pulling backing when a slot becomes a hard conflict
+
+## Repo map
+
+```text
+BACKED/
+├── index.html          # application shell
+├── styles.css          # editorial visual system
+├── src/
+│   ├── app.mjs         # UI + host-authoritative WebRTC transport
+│   ├── core.mjs        # pure room rules / state transitions
+│   └── ics.js          # local calendar parser
+├── tests/
+│   └── core.test.mjs   # decision-rule tests
+├── package.json
+├── HACKATHON_HANDOFF.md
+└── README.md
+```
+
+## Known constraints
+
+- The **host browser must stay open**. If it leaves, the room is no longer authoritative or joinable until that host/browser resumes its saved room.
+- PeerJS Cloud is public signaling infrastructure, not a production SLA.
+- A TURN server is not bundled; some restrictive/symmetric-NAT networks may fail to establish a direct connection.
+- There is no verified identity. Guest IDs are random and persistent locally, but names are self-asserted.
+- The room state is sent as snapshots and is optimized for small groups, not hundreds of participants.
+
+## Why this is stronger for a 30-minute judging environment
+
+The core idea is visible in seconds: **five scarce commitments, one inevitable lock**. The app opens with a one-click seeded demo, the product has a clear pain point, the network architecture is materially different from the supplied competitor repo, and every decision-critical rule can be tested without a deployed backend.
